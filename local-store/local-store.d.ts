@@ -12,6 +12,9 @@ declare interface ReadOnlyLocalStore {
      */
     getItem(key: string, plainString?: boolean): any;
 
+    /** Returns the n-th element in the store (in the order the items were added) */
+    key(index: number): string;
+
     /**
      * @param {string} key: the key to lookup
      * @return true if the item exist, false if not
@@ -43,6 +46,9 @@ declare interface LocalStore extends ReadOnlyLocalStore {
      * @return the value associated key that is now removed
      */
     removeItem(key: string): void;
+
+    /** Remove all key-values from this store */
+    clear(): void;
 }
 
 
@@ -61,6 +67,9 @@ declare interface UniqueStore extends ReadOnlyLocalStore {
      * @return the value associated key that is now removed
      */
     removeItem(key: string): void;
+
+    /** Remove all key-values from this store */
+    clear(): void;
 }
 
 
@@ -87,20 +96,26 @@ declare interface StorageLike {
 }
 
 
-declare interface LocalStoreItemCategorizer<T> {
+declare interface KeyCategorizer {
     category: string;
 
-    /**
-     * @return true if the key-value pair matches this categorizer's category, else false
+    /** Modify a key based on this categorizer's category so that it can recognize the key later (i.e. 'isMatchingCategory(modifyKey(key))' always returns true)
+     * @return the new key
      */
-    isMatch(key: string, value: T): boolean;
+    modifyKey(key: string): string;
+
+    /** Given a modified key (i.e. the return value from 'modifyKey()') return the unmodified original key
+     * @param key the modified key
+     */
+    unmodifyKey(key: string): string;
+
+    /** Check if a key matches this category
+     * @param key the key to check
+     */
+    isMatchingCategory(key: string): boolean;
 }
 
 
-declare interface LocalStoreItemMultiCategorizer<T> {
-
-    /**
-     * @return one of this categorizer's categories, else null if the key-value pair does not match one of these categories
-     */
-    findMatch(key: string, value: T): string;
+declare interface FullStoreHandler {
+    (storeInst: LocalStore, err: any): void;
 }

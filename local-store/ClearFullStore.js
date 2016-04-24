@@ -1,36 +1,33 @@
 "use strict";
-var UniqueChronologicalKey = require("./UniqueChronologicalKey");
-/** Handler for removing items from a full LocalStore object based on oldest timestamps extracted from the store's keys
+var UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
+/** Handler for removing items from a full LocalStore object based on oldest chronological IDs extracted from the store's keys
  * @author TeamworkGuy2
  * @since 2016-3-25
  */
 var ClearFullStore = (function () {
-    function ClearFullStore(localStoreInst, extractTimestamp, removePercentage) {
-        if (extractTimestamp === void 0) { extractTimestamp = Number.parseInt; }
+    function ClearFullStore(extractChronoId, removePercentage) {
         if (removePercentage === void 0) { removePercentage = 0.3; }
-        this.removePercentage = 0.3; // when the local store gets too full, remove one-third of the timestamp entries
+        /** [0.0, 1.0] when the local store gets too full, remove this percentage of the entries */
+        this.removePercentage = 0.3;
+        /** an internal counter of how many times clearOldItems() has been called */
         this.removalAttemptsCount = 0;
-        this.localStoreInst = localStoreInst;
-        this.extractTimestamp = extractTimestamp;
+        this.extractChronoId = extractChronoId;
         this.removePercentage = removePercentage;
     }
-    ClearFullStore.getDefaultInst = function (localStore) {
-        return ClearFullStore._defaultInst || (ClearFullStore._defaultInst = new ClearFullStore(localStore));
-    };
     /** Remove old items
      */
-    ClearFullStore.prototype.clearOldItems = function (logInfo, err, removePercentage, minItemsRemoved, maxItemsRemoved) {
+    ClearFullStore.prototype.clearOldItems = function (storeInst, logInfo, err, removePercentage, minItemsRemoved, maxItemsRemoved) {
         if (removePercentage === void 0) { removePercentage = this.removePercentage; }
         if (minItemsRemoved === void 0) { minItemsRemoved = 1; }
         if (logInfo) {
             var start = window.performance.now();
         }
-        var removeCount = ClearFullStore.removeOldItems(this.localStoreInst, this.extractTimestamp, removePercentage, minItemsRemoved, maxItemsRemoved);
+        var removeCount = ClearFullStore.removeOldItems(storeInst, this.extractChronoId, removePercentage, minItemsRemoved, maxItemsRemoved);
         this.removalAttemptsCount++;
         if (logInfo) {
             var end = window.performance.now();
             // TODO poor solution, log this manually, since psLog imports this class and we don't want a circular dependency
-            this.localStoreInst.setItem(UniqueChronologicalKey.uniqueTimestamp() + "", "removed " + removeCount + " local store entries in " + Math.round(end - start) + " ms, because local store threw error" + (err ? ": '" + err.message + "': " + JSON.stringify(err.stack) : ""));
+            storeInst.setItem(UniqueChronologicalKeys.uniqueTimestamp() + "", "removed " + removeCount + " local store entries in " + Math.round(end - start) + " ms, because local store threw error" + (err ? ": '" + err.message + "': " + JSON.stringify(err.stack) : ""));
         }
         return removeCount;
     };
@@ -43,27 +40,30 @@ var ClearFullStore = (function () {
      * this defaults to the total number of integer based keys in {@code localStore}
      * @return the number of items removed from the {@code localStore}
      */
-    ClearFullStore.removeOldItems = function (localStore, extractTimestamp, removePercentage, minItemsRemoved, maxItemsRemoved) {
+    ClearFullStore.removeOldItems = function (localStore, extractChronoId, removePercentage, minItemsRemoved, maxItemsRemoved) {
         if (minItemsRemoved === void 0) { minItemsRemoved = 1; }
-        var timestamps = [];
+        var ids = [];
         // get a list of integer keys from the local store
-        var itemKeys = localStore.getKeys();
-        for (var i = 0, size = itemKeys.length; i < size; i++) {
-            var val = extractTimestamp(itemKeys[i]);
+        var keys = localStore.getKeys();
+        for (var i = 0, size = keys.length; i < size; i++) {
+            var val = extractChronoId(keys[i]);
             if (Number.isInteger(val)) {
-                timestamps.push(val);
+                ids.push(val);
             }
         }
         // sort ascending
-        timestamps.sort(function (a, b) { return a - b; });
-        var timestampCount = timestamps.length;
-        maxItemsRemoved = maxItemsRemoved === void 0 ? timestampCount : Math.min(timestampCount, maxItemsRemoved);
-        var removeCount = Math.max(Math.min(Math.round(timestampCount * removePercentage), maxItemsRemoved), minItemsRemoved);
+        ids.sort(function (a, b) { return a - b; });
+        var idCount = ids.length;
+        maxItemsRemoved = maxItemsRemoved === undefined ? idCount : Math.min(idCount, maxItemsRemoved);
+        var removeCount = Math.max(Math.min(Math.round(idCount * removePercentage), maxItemsRemoved), minItemsRemoved);
         // remove the oldest timestamped entries (always remove between [1, timestamps.length] entries)
         for (var i = 0; i < removeCount; i++) {
-            localStore.removeItem(timestamps[i].toString());
+            localStore.removeItem(ids[i].toString());
         }
         return removeCount;
+    };
+    ClearFullStore.newInst = function (extractChronoId, removePercentage) {
+        return new ClearFullStore(extractChronoId, removePercentage);
     };
     return ClearFullStore;
 }());

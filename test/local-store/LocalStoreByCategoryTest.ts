@@ -1,9 +1,9 @@
 ﻿"use strict";
-"use strict";
+import ClearFullStore = require("../../local-store/ClearFullStore");
 import LocalStoreByCategory = require("../../local-store/LocalStoreByCategory");
-import UniqueChronologicalKey = require("../../local-store/UniqueChronologicalKey");
+import UniqueChronologicalKeys = require("../../local-store/UniqueChronologicalKeys");
 import MemoryStore = require("../../local-store/MemoryStore");
-import LocalStoreDefault = require("../../local-store/LocalStoreDefault");
+import LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
 import BasicCategorizers = require("../../local-store/BasicCategorizers");
 import CommonStorageTests = require("./CommonStorageTests");
 
@@ -14,22 +14,22 @@ interface CategoryEvent {
     page?: string;
 }
 
+var memStore = MemoryStore.newInst();
+var localStore = LocalStoreFromStorage.newInst(memStore, null, true, false, 80, false);
+var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+var store = storeBldr.addStores({
+    alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),
+    omega: storeBldr.toStore(BasicCategorizers.newSuffixCategorizer("-omega")),
+}).build();
+
+type TestStore = typeof store;
+
+
 QUnit.module("LocalStoreByCategory", {
 });
 
 
-QUnit.test("local-store-by-category-scenario-1", function LocalStoreByCategoryScenario1Test(sr) {
-    var memStore = MemoryStore.newInst();
-    var localStore = LocalStoreDefault.newInst(memStore, 80);
-
-    var store = LocalStoreByCategory.newInst(localStore, () => LocalStoreDefault.newInst(MemoryStore.newInst()), UniqueChronologicalKey.uniqueTimestampNodeJs, [
-        BasicCategorizers.createKeyPrefixCategorizer<any>("pre-"),
-        BasicCategorizers.createKeySuffixCategorizer<any>("-post"),
-        new BasicCategorizers.DefaultCategorizer<CategoryEvent>("value-wrapper", (ky, ve) => (ve.page ? ve.page.endsWith("user") : ve.userId == "demo-user"))
-    ], [
-        new BasicCategorizers.MultiCategorizerChecked<CategoryEvent>(["data-a", "data-b", "data-c"], (ky, ve) => ve.data.a ? "data-a" : (ve.data.b ? "data-b" : ve.data.c ? "data-c" : null)),
-        new BasicCategorizers.MultiCategorizerUnchecked<CategoryEvent>((ky, ve) => ve.userId)
-    ]);
+QUnit.test("local-store-by-category-1", function LocalStoreByCategoryScenario1Test(sr) {
 
     // category: 'data-a'
     var valA: CategoryEvent = {
@@ -62,56 +62,56 @@ QUnit.test("local-store-by-category-scenario-1", function LocalStoreByCategorySc
         dateTime: Date.now(),
     };
 
-    var keyA = store.addItem(valA);
-    var keyB = store.addItem(valB);
-    var keyC = store.addItem(valC);
-    var keyD = store.addItem(valD);
-    var keyE = store.addItem(valE);
+    store.rootStore.setItem("val-a", valA);
+    var keyA1 = store.stores.alpha.addItem(valB);
+    var keyA2 = store.stores.alpha.addItem(valC);
+    var keyO1 = store.stores.omega.addItem(valD);
+    var keyO2 = store.stores.omega.addItem(valE);
+    sr.equal(store.stores.alpha.length, 2);
+    sr.equal(store.stores.omega.length, 2);
 
-    sr.deepEqual(store.getItem(keyA), valA);
-    sr.deepEqual(store.getItem(keyB), valB);
-    sr.deepEqual(store.getItem(keyC), valC);
-    sr.deepEqual(store.getItem(keyD), valD);
-    sr.deepEqual(store.getItem(keyE), valE);
-    sr.equal(store.hasItem(keyA), true);
-    sr.equal(store.hasItem(keyB), true);
-    sr.equal(store.hasItem(keyC), true);
-    sr.equal(store.hasItem(keyD), true);
-    sr.equal(store.hasItem(keyE), true);
+    sr.deepEqual(store.rootStore.getItem("val-a"), valA);
+    sr.deepEqual(store.stores.alpha.getItem(keyA1), valB);
+    sr.deepEqual(store.stores.alpha.getItem(keyA2), valC);
+    sr.deepEqual(store.stores.omega.getItem(keyO1), valD);
+    sr.deepEqual(store.stores.omega.getItem(keyO2), valE);
+    sr.equal(store.rootStore.hasItem("val-a"), true);
+    sr.equal(store.stores.alpha.hasItem(keyA1), true);
+    sr.equal(store.stores.alpha.hasItem(keyA2), true);
+    sr.equal(store.stores.omega.hasItem(keyO1), true);
+    sr.equal(store.stores.omega.hasItem(keyO2), true);
 
-    sr.equal(store.hasItem("-"), false);
+    sr.equal(store.rootStore.hasItem("-"), false);
 
     assertDataStores(sr, store, [
-        { name: "data-a", size: 1, data: [valA] },
-        { name: "data-b", size: 1, data: [valB] },
-        { name: "data-c", size: 1, data: [valC] },
-        { name: "u2", size: 1, data: [valD] },
-        { name: "u3", size: 1, data: [valE] }
+        { name: "alpha", size: 2, data: [valB, valC] },
+        { name: "omega", size: 2, data: [valD, valE] },
     ]);
     //sr.equal(store.length, 5);
 
-    store.removeItem(keyB);
+    store.stores.alpha.removeItem(keyA1);
 
     assertDataStores(sr, store, [
-        { name: "data-a", size: 1, data: [valA] },
-        { name: "data-c", size: 1, data: [valC] },
-        { name: "u2", size: 1, data: [valD] },
-        { name: "u3", size: 1, data: [valE] }
+        { name: "alpha", size: 1, data: [valC] },
+        { name: "omega", size: 2, data: [valD, valE] },
     ]);
     //sr.equal(store.length, 4);
 
 });
 
-function assertDataStores(sr: QUnitAssert, store: LocalStoreByCategory, expectedSubStores: { name: string; size: number; data: any[] }[]) {
-    var categories = store.getCategoryStoresWithData();
+
+function assertDataStores(sr: QUnitAssert, store: TestStore, expectedSubStores: { name: string; size: number; data: any[] }[]) {
+    var stores = store.getStoresContainingData();
     var names: string[] = [];
 
     for (var i = 0, size = expectedSubStores.length; i < size; i++) {
         var expected = expectedSubStores[i];
         names.push(expected.name);
 
-        var categoryStore = categories[expected.name];
-        sr.equal(categoryStore.length, expected.size);
+        var categoryStore = stores[expected.name];
+        sr.notEqual(categoryStore, null, "no such store '" + expected.name + "' all stores: " + Object.keys(stores));
+        sr.equal(categoryStore.length, expected.size, "invalid store size: " + expected.name);
+
         if (expected.data && expected.data.length > 0) {
             for (var k = 0, sizeK = expected.data.length; k < sizeK; k++) {
                 sr.equal(CommonStorageTests.looseEqual(compareCategoryEvent, categoryStore.getData(), expected.data), true,
@@ -120,7 +120,7 @@ function assertDataStores(sr: QUnitAssert, store: LocalStoreByCategory, expected
         }
     }
 
-    sr.deepEqual(Object.keys(categories).sort(), names);
+    sr.deepEqual(Object.keys(stores).sort(), names);
 }
 
 

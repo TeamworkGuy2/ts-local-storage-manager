@@ -1,4 +1,4 @@
-﻿/** Functions for creating relatively unique, yet chronological keys
+﻿/** Functions for creating relatively unique, chronological keys
  * @author TeamworkGuy2
  * @since 2016-3-26
  */

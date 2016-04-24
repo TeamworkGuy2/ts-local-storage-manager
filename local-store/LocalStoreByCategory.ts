@@ -1,124 +1,98 @@
-﻿/**
+﻿import LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
+import LocalStoreWrapper = require("./LocalStoreWrapper");
+import MemoryStore = require("./MemoryStore");
+import ClearFullStore = require("./ClearFullStore");
+
+/**
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
-class LocalStoreByCategory {
-    private rootStore: LocalStore;
-    private singleCategorizers: LocalStoreItemCategorizer<any>[];
-    private multiCategorizers: LocalStoreItemMultiCategorizer<any>[];
-    private categorizedStores: { [category: string]: (LocalStore & { category: string; }) };
-    private storeFactory: () => LocalStore;
+class LocalStoreByCategory<M> {
     private timestampKeyGenerator: () => (string | number);
+    public rootStore: LocalStore;
+    public stores: M;
 
 
-    constructor(rootStore: LocalStore, storeFactory: () => LocalStore, timestampKeyGenerator: () => (string | number), singleCategorizers: LocalStoreItemCategorizer<any>[], multiCategorizers: LocalStoreItemMultiCategorizer<any>[]) {
+    constructor(rootStore: LocalStore, timestampKeyGenerator: () => (string | number), storeMap: M) {
         this.rootStore = rootStore;
-        this.storeFactory = storeFactory;
         this.timestampKeyGenerator = timestampKeyGenerator;
-        this.categorizedStores = {};
-        this.singleCategorizers = singleCategorizers;
-        this.multiCategorizers = multiCategorizers;
-    }
+        this.stores = <M>{};
 
-
-    public getItem(key: string, plainString?: boolean): any {
-        return this.rootStore.getItem(key, plainString);
-    }
-
-
-    public hasItem(key: string): boolean {
-        return this.rootStore.hasItem(key);
-    }
-
-
-    public getKeys(): string[] {
-        return this.rootStore.getKeys();
-    }
-
-
-    public addItem(value: any, plainString?: boolean): string {
-        var key = this.timestampKeyGenerator() + '';
-        this.setItem(key, value, plainString);
-        return key;
-    }
-
-
-    public setItem(key: string, value: any, plainString?: boolean): void {
-        var category = this.findCategory(key, value);
-        if (category == null) {
-            throw new Error("item key '" + key.substr(0, 100) + "' does not match any of this store's categories");
+        var keys = Object.keys(storeMap);
+        for (var i = 0, size = keys.length; i < size; i++) {
+            this.stores[keys[i]] = storeMap[keys[i]];
         }
-
-        this.rootStore.setItem(key, value, plainString);
-
-        var categoryStore = this.getCategoryStore(category);
-        categoryStore.setItem(key, value, plainString);
     }
 
 
-    public removeItem(key: string, plainString?: boolean): void {
-        var value = this.rootStore.getItem(key, plainString);
-
-        this.rootStore.removeItem(key);
-
-        var category = this.findCategory(key, value);
-
-        var categoryStore = this.getCategoryStore(category);
-        categoryStore.removeItem(key);
+    public getStore(category: string) {
+        var store = this.stores[category];
+        return store;
     }
 
 
-    public getCategoryStore(category: string) {
-        var categoryStore = this.categorizedStores[category];
-        if (categoryStore === undefined) {
-            categoryStore = <any>this.storeFactory();
-            categoryStore.category = category;
-            this.categorizedStores[category] = categoryStore;
-        }
-        return categoryStore;
-    }
-
-
-    public getCategoryStoresWithData(): { [category: string]: (LocalStore & { category: string; }) } {
-        var storesWithData: { [category: string]: (LocalStore & { category: string; }) } = {};
-        var categoryKeys = Object.keys(this.categorizedStores);
-        for (var i = 0, size = categoryKeys.length; i < size; i++) {
-            var categoryStore = this.categorizedStores[categoryKeys[i]];
+    public getStoresContainingData(): { [category: string]: UniqueStore } {
+        var storesWithData: { [category: string]: UniqueStore } = {};
+        var keys = Object.keys(this.stores);
+        for (var i = 0, size = keys.length; i < size; i++) {
+            var categoryStore = this.stores[keys[i]];
             if (categoryStore.length > 0) {
-                storesWithData[categoryKeys[i]] = categoryStore;
+                storesWithData[keys[i]] = categoryStore;
             }
         }
         return storesWithData;
     }
 
+}
 
-    public getKeyValueCategory(key: string, value: any): string {
-        var category = this.findCategory(key, value);
-        return category;
+module LocalStoreByCategory {
+
+    interface EmptyBuilder {
+        addStores<U>(stores: U): Builder<U>;
+        toStore(categorizer: KeyCategorizer): UniqueStore;
     }
 
 
-    private findCategory(key: string, value: any): string {
-        var sCategories = this.singleCategorizers;
-        for (var i = 0, size = sCategories.length; i < size; i++) {
-            if (sCategories[i].isMatch(key, value)) {
-                return sCategories[i].category;
-            }
+    export class Builder<T> implements EmptyBuilder {
+        private storeInst: LocalStore;
+        private keyGenerator: () => (string | number);
+        private stores: T;
+
+        constructor(storeInst: LocalStore, keyGenerator: () => (string | number)) {
+            this.storeInst = storeInst;
+            this.keyGenerator = keyGenerator;
+            this.stores = <T>{};
         }
-        var mCategories = this.multiCategorizers;
-        for (var i = 0, size = mCategories.length; i < size; i++) {
-            var category: string;
-            if ((category = mCategories[i].findMatch(key, value)) != null) {
-                return category;
-            }
-        }
-        return null;
-    }
 
 
-    public static newInst(storeInst: LocalStore, storeFactory: () => LocalStore, timestampKeyGenerator: () => (string | number),
-            singleCategorizers: LocalStoreItemCategorizer<any>[], multiCategorizers: LocalStoreItemMultiCategorizer<any>[]) {
-        return new LocalStoreByCategory(storeInst, storeFactory, timestampKeyGenerator, singleCategorizers, multiCategorizers);
+        public addStores<U extends { [name: string]: UniqueStore }>(stores: U): Builder<T & U> {
+            var keys = Object.keys(stores);
+            for (var i = 0, size = keys.length; i < size; i++) {
+                this.stores[keys[i]] = stores[keys[i]];
+            }
+            return <Builder<T & U>><any>this;
+        }
+
+
+        public build(): LocalStoreByCategory<T> {
+            return new LocalStoreByCategory(this.storeInst, this.keyGenerator, this.stores);
+        }
+
+
+        public toStore(categorizer: KeyCategorizer, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore {
+            var fullStoreHandler = new ClearFullStore((key) => Number.parseInt(categorizer.unmodifyKey(key)), removePercentage);
+            var fullStoreHandlerFunc = (storeInst, err) => fullStoreHandler.clearOldItems(storeInst, false, err);
+
+            var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, (key) => categorizer.isMatchingCategory(key));
+
+            return new LocalStoreByTimestamp(storeWrapper, () => categorizer.modifyKey(this.keyGenerator() + ''), fullStoreHandlerFunc);
+        }
+
+
+        public static newInst<U extends { [name: string]: UniqueStore }>(storeInst: LocalStore, keyGenerator: () => (string | number)): EmptyBuilder {
+            return new Builder<U>(storeInst, keyGenerator);
+        }
+
     }
 
 }

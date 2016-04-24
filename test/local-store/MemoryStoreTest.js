@@ -2,7 +2,7 @@
 var MemoryStore = require("../../local-store/MemoryStore");
 var CommonStorageTests = require("./CommonStorageTests");
 QUnit.module("MemoryStore", {});
-QUnit.test("memory-store scenario 1", function MemoryStorageScenario1Test(sr) {
+QUnit.test("memory-store", function MemoryStorageScenario1Test(sr) {
     var store = MemoryStore.newInst();
     CommonStorageTests.addAndRemove(sr, store);
     CommonStorageTests.keyAndGetItem(sr, store);

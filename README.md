@@ -4,6 +4,22 @@ TS Local Store and More
 Dependencies:
 none
 
-TypeScript wrappers for 'Storage' instances (i.e. javascript web environment 'localStorage' type objects) as well as stand alone implementations. 
+TypeScript wrappers for treating 'Storage' instances (i.e. 'localStorage' type objects in browsers) like collections. 
+
+The goal is to provide an easy to setup (5-10 loc) wrapper for 'localStorage' which you can use throughout a project in place of localStorage and also:
+* exposes changes to the underlying 'localStorage' object seamlessly (i.e. if a 3rd party library modifies 'localStorage', this library objects will reflect those changes)
+* provides meta-data tracking, such as the total size of the data in 'localStorage', history of added/removed items
+
+Future goals:
+* API to attach handlers for archiving old data as 'localStorage' gets full
+
+
+Major API Pieces:
+LocalStoreByCategory - a class which contains a group of other LocalStores and allows you to treat 'localStorage' like a group of collections. 
+
+MemoryStore - provides a pure in-memory implementation of the interface exposed by 'localStorage' (i.e. lib.d.ts 'Storage'). 
+
+LocalStoreFromStorage and LocalStoreWrapper - provide additional validation ontop of existing 'StorageLike' or 'LocalStore' objects. 
+
 
 See the /test directory for example usage of the functions in this project. 

@@ -1,14 +1,14 @@
 "use strict";
 var LocalStoreByTimestamp = require("../../local-store/LocalStoreByTimestamp");
-var UniqueChronologicalKey = require("../../local-store/UniqueChronologicalKey");
+var UniqueChronologicalKeys = require("../../local-store/UniqueChronologicalKeys");
 var MemoryStore = require("../../local-store/MemoryStore");
-var LocalStoreDefault = require("../../local-store/LocalStoreDefault");
+var LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
 QUnit.module("LocalStoreByTimestamp", {});
-QUnit.test("local-store-by-timestamp-scenario-1", function LocalStoreByTimestampScenario1Test(sr) {
+QUnit.test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test(sr) {
     var memStore = MemoryStore.newInst();
-    var localStore = LocalStoreDefault.newInst(memStore, 20);
-    var store = LocalStoreByTimestamp.newDefaultInst(localStore);
-    store.timestampKeyGenerator = function () { return UniqueChronologicalKey.uniqueTimestampNodeJs() + ''; };
+    var localStore = LocalStoreFromStorage.newInst(memStore, null, false, false, 20);
+    var store = LocalStoreByTimestamp.newUniqueTimestampInst(localStore, Number.parseInt);
+    store.keyGenerator = UniqueChronologicalKeys.uniqueTimestampNodeJs;
     var keyA = store.addItem({ a: 1 });
     var keyB = store.addItem({ b: 1 });
     sr.deepEqual(store.getKeys(), [keyA, keyB]);

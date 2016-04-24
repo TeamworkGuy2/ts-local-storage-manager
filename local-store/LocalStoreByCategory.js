@@ -1,90 +1,68 @@
 "use strict";
+var LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
+var LocalStoreWrapper = require("./LocalStoreWrapper");
+var ClearFullStore = require("./ClearFullStore");
 /**
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
 var LocalStoreByCategory = (function () {
-    function LocalStoreByCategory(rootStore, storeFactory, timestampKeyGenerator, singleCategorizers, multiCategorizers) {
+    function LocalStoreByCategory(rootStore, timestampKeyGenerator, storeMap) {
         this.rootStore = rootStore;
-        this.storeFactory = storeFactory;
         this.timestampKeyGenerator = timestampKeyGenerator;
-        this.categorizedStores = {};
-        this.singleCategorizers = singleCategorizers;
-        this.multiCategorizers = multiCategorizers;
+        this.stores = {};
+        var keys = Object.keys(storeMap);
+        for (var i = 0, size = keys.length; i < size; i++) {
+            this.stores[keys[i]] = storeMap[keys[i]];
+        }
     }
-    LocalStoreByCategory.prototype.getItem = function (key, plainString) {
-        return this.rootStore.getItem(key, plainString);
+    LocalStoreByCategory.prototype.getStore = function (category) {
+        var store = this.stores[category];
+        return store;
     };
-    LocalStoreByCategory.prototype.hasItem = function (key) {
-        return this.rootStore.hasItem(key);
-    };
-    LocalStoreByCategory.prototype.getKeys = function () {
-        return this.rootStore.getKeys();
-    };
-    LocalStoreByCategory.prototype.addItem = function (value, plainString) {
-        var key = this.timestampKeyGenerator() + '';
-        this.setItem(key, value, plainString);
-        return key;
-    };
-    LocalStoreByCategory.prototype.setItem = function (key, value, plainString) {
-        var category = this.findCategory(key, value);
-        if (category == null) {
-            throw new Error("item key '" + key.substr(0, 100) + "' does not match any of this store's categories");
-        }
-        this.rootStore.setItem(key, value, plainString);
-        var categoryStore = this.getCategoryStore(category);
-        categoryStore.setItem(key, value, plainString);
-    };
-    LocalStoreByCategory.prototype.removeItem = function (key, plainString) {
-        var value = this.rootStore.getItem(key, plainString);
-        this.rootStore.removeItem(key);
-        var category = this.findCategory(key, value);
-        var categoryStore = this.getCategoryStore(category);
-        categoryStore.removeItem(key);
-    };
-    LocalStoreByCategory.prototype.getCategoryStore = function (category) {
-        var categoryStore = this.categorizedStores[category];
-        if (categoryStore === undefined) {
-            categoryStore = this.storeFactory();
-            categoryStore.category = category;
-            this.categorizedStores[category] = categoryStore;
-        }
-        return categoryStore;
-    };
-    LocalStoreByCategory.prototype.getCategoryStoresWithData = function () {
+    LocalStoreByCategory.prototype.getStoresContainingData = function () {
         var storesWithData = {};
-        var categoryKeys = Object.keys(this.categorizedStores);
-        for (var i = 0, size = categoryKeys.length; i < size; i++) {
-            var categoryStore = this.categorizedStores[categoryKeys[i]];
+        var keys = Object.keys(this.stores);
+        for (var i = 0, size = keys.length; i < size; i++) {
+            var categoryStore = this.stores[keys[i]];
             if (categoryStore.length > 0) {
-                storesWithData[categoryKeys[i]] = categoryStore;
+                storesWithData[keys[i]] = categoryStore;
             }
         }
         return storesWithData;
     };
-    LocalStoreByCategory.prototype.getKeyValueCategory = function (key, value) {
-        var category = this.findCategory(key, value);
-        return category;
-    };
-    LocalStoreByCategory.prototype.findCategory = function (key, value) {
-        var sCategories = this.singleCategorizers;
-        for (var i = 0, size = sCategories.length; i < size; i++) {
-            if (sCategories[i].isMatch(key, value)) {
-                return sCategories[i].category;
-            }
-        }
-        var mCategories = this.multiCategorizers;
-        for (var i = 0, size = mCategories.length; i < size; i++) {
-            var category;
-            if ((category = mCategories[i].findMatch(key, value)) != null) {
-                return category;
-            }
-        }
-        return null;
-    };
-    LocalStoreByCategory.newInst = function (storeInst, storeFactory, timestampKeyGenerator, singleCategorizers, multiCategorizers) {
-        return new LocalStoreByCategory(storeInst, storeFactory, timestampKeyGenerator, singleCategorizers, multiCategorizers);
-    };
     return LocalStoreByCategory;
 }());
+var LocalStoreByCategory;
+(function (LocalStoreByCategory) {
+    var Builder = (function () {
+        function Builder(storeInst, keyGenerator) {
+            this.storeInst = storeInst;
+            this.keyGenerator = keyGenerator;
+            this.stores = {};
+        }
+        Builder.prototype.addStores = function (stores) {
+            var keys = Object.keys(stores);
+            for (var i = 0, size = keys.length; i < size; i++) {
+                this.stores[keys[i]] = stores[keys[i]];
+            }
+            return this;
+        };
+        Builder.prototype.build = function () {
+            return new LocalStoreByCategory(this.storeInst, this.keyGenerator, this.stores);
+        };
+        Builder.prototype.toStore = function (categorizer, maxValueSizeBytes, removePercentage) {
+            var _this = this;
+            var fullStoreHandler = new ClearFullStore(function (key) { return Number.parseInt(categorizer.unmodifyKey(key)); }, removePercentage);
+            var fullStoreHandlerFunc = function (storeInst, err) { return fullStoreHandler.clearOldItems(storeInst, false, err); };
+            var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, function (key) { return categorizer.isMatchingCategory(key); });
+            return new LocalStoreByTimestamp(storeWrapper, function () { return categorizer.modifyKey(_this.keyGenerator() + ''); }, fullStoreHandlerFunc);
+        };
+        Builder.newInst = function (storeInst, keyGenerator) {
+            return new Builder(storeInst, keyGenerator);
+        };
+        return Builder;
+    }());
+    LocalStoreByCategory.Builder = Builder;
+})(LocalStoreByCategory || (LocalStoreByCategory = {}));
 module.exports = LocalStoreByCategory;

@@ -4,6 +4,7 @@
  */
 class MemoryStore implements StorageLike {
     private len: number;
+    private totalDataSize: number;
     private modCount: number;
     private keys: string[];
     private data: { [key: string]: string };
@@ -17,20 +18,24 @@ class MemoryStore implements StorageLike {
     }
 
 
-    public get length(): number { return this.len; }
+    public get length() { return this.len; }
+
+
+    public get totalSizeChars() { return this.totalDataSize; }
 
 
     public clear(): void {
         this.data = {};
         this.keys = [];
         this.len = 0;
+        this.totalDataSize = 0;
         this.modCount = 0;
     }
 
 
     public getItem(key: string): any {
         var value = this.data[key];
-        return value === undefined ? null : value;
+        return value;
     }
 
 
@@ -40,28 +45,24 @@ class MemoryStore implements StorageLike {
 
 
     public removeItem(key: string): void {
-        var exists = this.data[key] !== undefined;
+        var existingData = this.data[key];
 
-        if (exists) {
+        if (existingData !== undefined) {
             delete this.data[key];
-            this.len--;
-            this.modCount++;
-            MemoryStore.removeAryItem(key, this.keys);
         }
+
+        this.logItemRemoved(key, existingData);
     }
 
 
     public setItem(key: string, data: string): void {
         key = key === undefined ? "undefined" : (key === null ? "null" : key);
-        var exists = this.data[key] !== undefined;
+        var existingData = this.data[key];
 
-        this.data[key] = data === undefined ? "undefined" : (data === null ? "null" : data.toString());
+        var dataStr = data === undefined ? "undefined" : (data === null ? "null" : data.toString())
+        this.data[key] = dataStr;
 
-        if (!exists) {
-            this.len++;
-            this.modCount++;
-            this.keys.push(key);
-        }
+        this.logItemAdded(key, dataStr, existingData);
     }
 
 
@@ -70,11 +71,40 @@ class MemoryStore implements StorageLike {
     }
 
 
-    private static removeAryItem(key: string, keys: string[]): void {
+    private logItemAdded(key: string, value: string, existingValue: string): void {
+        var exists = existingValue !== undefined;
+        if (!exists) {
+            this.len++;
+            this.modCount++;
+            this.keys.push(key);
+        }
+        else {
+            this.totalDataSize -= existingValue.length;
+        }
+        this.totalDataSize += value.length;
+    }
+
+
+    private logItemRemoved(key: string, existingValue: string): void {
+        var exists = existingValue !== undefined;
+
+        if (exists) {
+            this.len--;
+            this.totalDataSize -= existingValue.length;
+            this.modCount++;
+            MemoryStore.removeAryItem(key, this.keys);
+        }
+    }
+
+
+    public static removeAryItem(key: string, keys: string[]): void {
         var idx = keys.indexOf(key);
         var size = keys.length;
-        if (idx == size - 1) {
+        if (idx === size - 1) {
             keys.pop();
+        }
+        else if (idx === 0) {
+            keys.shift();
         }
         else {
             for (var i = idx; i < size - 1; i++) {

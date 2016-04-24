@@ -6,15 +6,27 @@ module BasicCategorizers {
 
     /** A categorizer based on 'key' string prefixes from key-value pairs
      */
-    export function createKeyPrefixCategorizer<T>(prefix: string): DefaultCategorizer<T> {
-        return new DefaultCategorizer(prefix, (key) => key.startsWith(prefix));
+    export function newPrefixCategorizer(prefix: string): DefaultCategorizer {
+        return new DefaultCategorizer(prefix, (key) => {
+            return prefix + key;
+        }, (key) => {
+            return key.substr(prefix.length);
+        }, (key) => {
+            return key != null && key.substr(0, prefix.length) === prefix;
+        });
     }
 
 
     /** A categorizer based on 'key' string suffixes from key-value pairs
      */
-    export function createKeySuffixCategorizer<T>(suffix: string): DefaultCategorizer<T> {
-        return new DefaultCategorizer(suffix, (key) => key.endsWith(suffix));
+    export function newSuffixCategorizer(suffix: string): DefaultCategorizer {
+        return new DefaultCategorizer(suffix, (key) => {
+            return key + suffix;
+        }, (key) => {
+            return key.substr(0, key.length - suffix.length);
+        }, (key) => {
+            return key != null && key.length >= suffix.length && key.substr(key.length - suffix.length) === suffix;
+        });
     }
 
 
@@ -22,77 +34,25 @@ module BasicCategorizers {
 
     /** Default categorizer implementation
      */
-    export class DefaultCategorizer<T> implements LocalStoreItemCategorizer<T> {
-        private _category: string;
-        public isMatch: (key: string, value: T) => boolean;
+    export class DefaultCategorizer implements KeyCategorizer {
+        public category: string;
+        public modifyKey: (key: string) => string;
+        public unmodifyKey: (key: string) => string;
+        public isMatchingCategory: (key: string) => boolean;
 
 
         /**
          * @param checkFunc a function which given a store item's key, returns true if the key matches this category, false if not
          */
-        constructor(category: string, checkFunc: (key: string, value: T) => boolean) {
-            this._category = category;
-            this.isMatch = checkFunc;
-        }
-
-
-        public get category() { return this._category; }
-
-    }
-
-
-
-
-    /** This categorizer ensures that the category names returned by the constructor 'checkFunc' parameter, always match one of the provided 'categories', else throw an error
-     * @see MultiCategorizerUnchecked
-     */
-    export class MultiCategorizerChecked<T> implements LocalStoreItemMultiCategorizer<T> {
-        private _categories: string[];
-        private _checkFunc: (key: string, value: T) => string;
-
-
-        /**
-         * @param checkFunc a function which given a store item's key, returns true if the key matches this category, false if not
-         */
-        constructor(categories: string[], checkFunc: (key: string, value: T) => string) {
-            this._categories = categories;
-            this._checkFunc = checkFunc;
-        }
-
-
-        public get categories() { return this._categories; }
-
-
-        /** Use the custom 'checkFunc', but wrap it with a check to ensure the returned category matches one of this categorizer's categories
-         */
-        public findMatch(key: string, value: T): string {
-            var resCategory = this._checkFunc(key, value);
-            if (resCategory != null && this.categories.indexOf(resCategory) < 0) {
-                throw new Error("key '" + key.substr(0, 100) + "' does not match any of this categorizer's categories: " + this.categories.join(", ") + ", data: " + JSON.stringify(value).substr(0, 100));
-            }
-            return resCategory;
+        constructor(category: string, modifyKey: (key: string) => string, unmodifyKey: (key: string) => string, matchingKey: (key: string) => boolean) {
+            this.category = category;
+            this.modifyKey = modifyKey;
+            this.unmodifyKey = unmodifyKey;
+            this.isMatchingCategory = matchingKey;
         }
 
     }
 
-
-
-
-    /** This categorizer does not checking and simply wraps a provided 'checkFunc'
-     * @see MultiCategorizerChecked
-     */
-    export class MultiCategorizerUnchecked<T> implements LocalStoreItemMultiCategorizer<T> {
-        public findMatch: (key: string, value: T) => string;
-
-
-        /**
-         * @param checkFunc a function which given a store item's key, returns true if the key matches this category, false if not
-         */
-        constructor(checkFunc: (key: string, value: T) => string) {
-            this.findMatch = checkFunc;
-        }
-
-    }
 
 }
 

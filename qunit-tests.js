@@ -18,8 +18,8 @@ testRunner.setup({
     }
 });
 testRunner.run({
-    code: "./local-store/LocalStoreDefault",
-    tests: "./test/local-store/LocalStoreDefaultTest.js"
+    code: "./local-store/LocalStoreFromStorage",
+    tests: "./test/local-store/LocalStoreFromStorageTest.js"
 }, callback);
 testRunner.run({
     code: "./local-store/MemoryStore",
