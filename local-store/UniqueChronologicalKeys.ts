@@ -6,7 +6,7 @@ module UniqueChronologicalKey {
 
     export function uniqueTimestamp(): number {
         // work around for the granularity of Date.now() and the rollover issue with performance.now()
-        return Math.round((Date.now() + window.performance.now()) / 2 * 1000);
+        return Math.round((Date.now() + window.performance.now()/*millisecond with decimal portion up to microsecond precise*/) / 2 * 1000);
     }
 
 
@@ -14,6 +14,16 @@ module UniqueChronologicalKey {
         // work around for the granularity of Date.now() and the rollover issue with performance.now()
         return Math.round((Date.now() + GLOBAL.process.hrtime()[1]/*nanoseconds*/) / 2 * 1000);
     }
+
+
+    /** get a chronological millisecond value, pairs of calls to this function during the same runtime can be compared to get relatively acurate time measurements,
+     * no other guarantees are made about the returned number
+     */
+    export var getMillisecondTime = ((typeof window !== "undefined" && window && window.performance) ? () => {
+        return window.performance.now();
+    } : () => {
+        return Math.floor(GLOBAL.process.hrtime()[1] / 1000); /*because hrtime()[1] is nanoseconds*/
+    });
 
 }
 

@@ -9,7 +9,7 @@ var LocalStoreWrapper = (function () {
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
@@ -120,19 +120,18 @@ var LocalStoreWrapper = (function () {
                 if (this.keys != null) {
                     this.logItemAdded(key, value, existingData);
                 }
-                if (attempt >= retryAttempts) {
-                    break;
-                }
+                return;
             }
             catch (err) {
                 try {
                     // clean out old data in-case the error was the local store running out of space
-                    this.handleFullStore(this.store, err);
+                    this.handleFullStore(this, err);
                 }
                 catch (e2) {
                     if (attempt >= retryAttempts) {
                         var errMsg = "problem: storing key-value '" + key + "' = '" + (value && value.substr ? value.substr(0, 100) : value) + "' in key-value store;" +
-                            "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + ", but clearing old data from the store threw another error: " + err;
+                            "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + " from: " + err + ", " +
+                            "but attempting to recover threw another error: " + e2;
                         if (console && typeof console.error === "function") {
                             console.error(errMsg, err.message, err.stack);
                         }
@@ -180,7 +179,7 @@ var LocalStoreWrapper = (function () {
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'

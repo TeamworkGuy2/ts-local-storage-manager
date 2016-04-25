@@ -4,7 +4,19 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.2.0](N/A) - 2016-04-23
+### [0.3.0](N/A) - 2016-04-24
+#### Added
+* MemoryStore validation parameters to limit total size of data in the store or limit the number of items in the store
+
+#### Changed
+Extensive refactoring to add support for full store callbacks:
+* LocalStoreFromStorage - added constructor and newInst() 'handleFullStore' parameters
+* LocalStoreByTimestamp.new*Inst() and LocalStoreByCategory.toStore() - added 'itemsRemovedCallback' parameter to allow for customization of the item removal process when items are removed from a full store
+* ClearFullStore - also got a 'itemsRemovedCallback' constructor and newInst() parameter, returns more detailed information about the items removed. the 'logInfo' flag now supports node.js (via GLOBAL.process.hrtime()) as well as browser enviroments when attempting to time the removal process
+
+
+--------
+### [0.2.0](https://github.com/TeamworkGuy2/ts-local-store-and-more/commit/02517d5feda72a9ebf8269e6a95cc0ab21b43b1e) - 2016-04-23
 #### Added
 * A CHANGELOG.md covering all previous releases after being reminded about the need for change logs from http://keepachangelog.com/
 * LocalStoreDefault has been split for 'StorageLike' vs 'LocalStore' wrappers:

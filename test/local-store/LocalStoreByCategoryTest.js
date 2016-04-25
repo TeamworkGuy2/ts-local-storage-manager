@@ -6,7 +6,7 @@ var LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
 var BasicCategorizers = require("../../local-store/BasicCategorizers");
 var CommonStorageTests = require("./CommonStorageTests");
 var memStore = MemoryStore.newInst();
-var localStore = LocalStoreFromStorage.newInst(memStore, null, true, false, 80, false);
+var localStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
 var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
 var store = storeBldr.addStores({
     alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),

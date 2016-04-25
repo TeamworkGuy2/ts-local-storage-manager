@@ -8,13 +8,40 @@ class MemoryStore implements StorageLike {
     private modCount: number;
     private keys: string[];
     private data: { [key: string]: string };
+    /** returns true if adding the 'value' is valid, false if not, 'existingValue' is the existing value mapped to 'key', undefined if there is no existing value */
+    private validateBeforeSet: (key: string, value: string, existingValue: string) => boolean;
 
 
-    constructor() {
+    /**
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    constructor(maxDataSize?: number, maxItems?: number) {
         this.data = {};
         this.len = 0;
         this.keys = [];
         this.modCount = 0;
+        this.setValidation(maxDataSize, maxItems);
+    }
+
+
+    /**
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    public setValidation(maxDataSize?: number, maxItems?: number) {
+        if (maxDataSize != null || maxItems != null) {
+            if (maxDataSize != null) {
+                this.validateBeforeSet = (key, value, existingValue) => {
+                    return this.totalDataSize + value.length - (existingValue !== undefined ? existingValue.length : 0) <= maxDataSize;
+                };
+            }
+            else if (maxItems != null) {
+                this.validateBeforeSet = (key, value, existingValue) => {
+                    return this.len + (existingValue === undefined ? 1 : 0) <= maxItems;
+                };
+            }
+        }
     }
 
 
@@ -60,6 +87,12 @@ class MemoryStore implements StorageLike {
         var existingData = this.data[key];
 
         var dataStr = data === undefined ? "undefined" : (data === null ? "null" : data.toString())
+
+        var allow = this.validateBeforeSet == null || this.validateBeforeSet(key, dataStr, existingData);
+        if (!allow) {
+            throw new Error("in-memory store size limit quota reached");
+        }
+
         this.data[key] = dataStr;
 
         this.logItemAdded(key, dataStr, existingData);
@@ -115,8 +148,12 @@ class MemoryStore implements StorageLike {
     }
 
 
-    public static newInst() {
-        return new MemoryStore();
+    /** Create a memory store with optional limits on the stored data
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    public static newInst(maxDataSize?: number, maxItems?: number) {
+        return new MemoryStore(maxDataSize, maxItems);
     }
 
 }

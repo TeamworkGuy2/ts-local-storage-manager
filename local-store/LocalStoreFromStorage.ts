@@ -1,8 +1,7 @@
 ﻿import LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
 import MemoryStore = require("./MemoryStore");
 
-/** LocalStoreDefault namespace
- * simple persistent storage interface for small objects or data blobs
+/** LocalStore implementation wrapper for StorageLike objects
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
@@ -13,7 +12,7 @@ class LocalStoreFromStorage implements LocalStore {
     private MAX_ITEM_SIZE_BYTES = 1000000;
     private store: StorageLike & { getKeys?: () => string[]; };
     private getStoreKeys: (store: StorageLike) => string[];
-    private passThrough: boolean;
+    private handleFullStore: FullStoreHandler;
     private trackTotalSize: boolean;
     private len: number;
     private totalDataSize: number;
@@ -24,16 +23,18 @@ class LocalStoreFromStorage implements LocalStore {
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
+     * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], trackKeysAndLen: boolean, trackTotalSize: boolean,
-            maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
+    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.getStoreKeys = getStoreKeys;
+        this.handleFullStore = handleFullStore;
         this.MAX_ITEM_SIZE_BYTES = maxValueSizeBytes;
         this.trackTotalSize = trackTotalSize;
         this.len = 0;
@@ -122,7 +123,7 @@ class LocalStoreFromStorage implements LocalStore {
         var jsonString = plainString === true ? <string>value : JSON.stringify(value);
 
         if (jsonString.length > this.MAX_ITEM_SIZE_BYTES) {
-            var errMsg = "attempting to save too large a value to localStorage, key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
+            var errMsg = "attempting to save a local store value large than the specified limit of " + this.MAX_ITEM_SIZE_BYTES + ", key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
             if (console && typeof console.error === "function") {
                 console.error(errMsg);
             }
@@ -132,7 +133,7 @@ class LocalStoreFromStorage implements LocalStore {
     }
 
 
-    private tryLogSetItem(key: string, value: string, retryAttempts: number = 1) {
+    private tryLogSetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
                 if (this.keys != null) {
@@ -146,14 +147,11 @@ class LocalStoreFromStorage implements LocalStore {
                     this.logItemAdded(key, value, existingData);
                 }
 
-                if (attempt >= retryAttempts) {
-                    break;
-                }
+                return;
             } catch (err) {
                 try {
-                    // clean out old data in-case the error was the local store running out of space
-                    var rootStore = LocalStoreFromStorage.getDefaultInst();
-                    LocalStoreByTimestamp.getDefaultInst(rootStore).handleFullStore(rootStore, err);
+                    // clean out old data in-case the error was the local store running out of space, if the full store handle is null, just let that generate a null error
+                    this.handleFullStore(this, err);
                 } catch (e2) {
                     if (attempt >= retryAttempts) {
                         var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' in key-value store;" +
@@ -209,29 +207,32 @@ class LocalStoreFromStorage implements LocalStore {
     }
 
 
-
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], trackKeysAndLen: boolean, trackTotalSize: boolean,
-            maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
-        return new LocalStoreFromStorage(store, getStoreKeys, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
+    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
+        return new LocalStoreFromStorage(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     }
 
 
-    public static getDefaultInst() {
-        return LocalStoreFromStorage.defaultInst || (LocalStoreFromStorage.defaultInst = new LocalStoreFromStorage(localStorage, null, true, true, undefined, true));
+    public static getDefaultInst(itemsRemovedCallback?: ItemsRemovedCallback) {
+        return LocalStoreFromStorage.defaultInst || (LocalStoreFromStorage.defaultInst = new LocalStoreFromStorage(localStorage, null, (store, err) => {
+            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+        }, true, true, undefined, true));
     }
 
 
-    public static getSessionInst() {
-        return LocalStoreFromStorage.sessionInst || (LocalStoreFromStorage.sessionInst = new LocalStoreFromStorage(sessionStorage, null, true, true, undefined, true));
+    public static getSessionInst(itemsRemovedCallback?: ItemsRemovedCallback) {
+        return LocalStoreFromStorage.sessionInst || (LocalStoreFromStorage.sessionInst = new LocalStoreFromStorage(sessionStorage, null, (store, err) => {
+            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+        }, true, true, undefined, true));
     }
 
 }

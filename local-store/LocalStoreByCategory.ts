@@ -79,8 +79,8 @@ module LocalStoreByCategory {
         }
 
 
-        public toStore(categorizer: KeyCategorizer, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore {
-            var fullStoreHandler = new ClearFullStore((key) => Number.parseInt(categorizer.unmodifyKey(key)), removePercentage);
+        public toStore(categorizer: KeyCategorizer, itemsRemovedCallback?: ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore {
+            var fullStoreHandler = ClearFullStore.newInst((key) => Number.parseInt(categorizer.unmodifyKey(key)), itemsRemovedCallback, removePercentage);
             var fullStoreHandlerFunc = (storeInst, err) => fullStoreHandler.clearOldItems(storeInst, false, err);
 
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, (key) => categorizer.isMatchingCategory(key));

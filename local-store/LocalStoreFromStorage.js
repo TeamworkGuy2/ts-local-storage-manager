@@ -1,8 +1,7 @@
 "use strict";
 var LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
 var MemoryStore = require("./MemoryStore");
-/** LocalStoreDefault namespace
- * simple persistent storage interface for small objects or data blobs
+/** LocalStore implementation wrapper for StorageLike objects
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
@@ -10,17 +9,19 @@ var LocalStoreFromStorage = (function () {
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
+     * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    function LocalStoreFromStorage(store, getStoreKeys, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
+    function LocalStoreFromStorage(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
         this.MAX_ITEM_SIZE_BYTES = 1000000;
         this.store = store;
         this.getStoreKeys = getStoreKeys;
+        this.handleFullStore = handleFullStore;
         this.MAX_ITEM_SIZE_BYTES = maxValueSizeBytes;
         this.trackTotalSize = trackTotalSize;
         this.len = 0;
@@ -95,7 +96,7 @@ var LocalStoreFromStorage = (function () {
         }
         var jsonString = plainString === true ? value : JSON.stringify(value);
         if (jsonString.length > this.MAX_ITEM_SIZE_BYTES) {
-            var errMsg = "attempting to save too large a value to localStorage, key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
+            var errMsg = "attempting to save a local store value large than the specified limit of " + this.MAX_ITEM_SIZE_BYTES + ", key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
             if (console && typeof console.error === "function") {
                 console.error(errMsg);
             }
@@ -115,15 +116,12 @@ var LocalStoreFromStorage = (function () {
                 if (this.keys != null) {
                     this.logItemAdded(key, value, existingData);
                 }
-                if (attempt >= retryAttempts) {
-                    break;
-                }
+                return;
             }
             catch (err) {
                 try {
-                    // clean out old data in-case the error was the local store running out of space
-                    var rootStore = LocalStoreFromStorage.getDefaultInst();
-                    LocalStoreByTimestamp.getDefaultInst(rootStore).handleFullStore(rootStore, err);
+                    // clean out old data in-case the error was the local store running out of space, if the full store handle is null, just let that generate a null error
+                    this.handleFullStore(this, err);
                 }
                 catch (e2) {
                     if (attempt >= retryAttempts) {
@@ -176,20 +174,24 @@ var LocalStoreFromStorage = (function () {
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store, cannot be true if 'passThrough' is also true
+     * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    LocalStoreFromStorage.newInst = function (store, getStoreKeys, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
+    LocalStoreFromStorage.newInst = function (store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
-        return new LocalStoreFromStorage(store, getStoreKeys, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
+        return new LocalStoreFromStorage(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     };
-    LocalStoreFromStorage.getDefaultInst = function () {
-        return LocalStoreFromStorage.defaultInst || (LocalStoreFromStorage.defaultInst = new LocalStoreFromStorage(localStorage, null, true, true, undefined, true));
+    LocalStoreFromStorage.getDefaultInst = function (itemsRemovedCallback) {
+        return LocalStoreFromStorage.defaultInst || (LocalStoreFromStorage.defaultInst = new LocalStoreFromStorage(localStorage, null, function (store, err) {
+            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+        }, true, true, undefined, true));
     };
-    LocalStoreFromStorage.getSessionInst = function () {
-        return LocalStoreFromStorage.sessionInst || (LocalStoreFromStorage.sessionInst = new LocalStoreFromStorage(sessionStorage, null, true, true, undefined, true));
+    LocalStoreFromStorage.getSessionInst = function (itemsRemovedCallback) {
+        return LocalStoreFromStorage.sessionInst || (LocalStoreFromStorage.sessionInst = new LocalStoreFromStorage(sessionStorage, null, function (store, err) {
+            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+        }, true, true, undefined, true));
     };
     return LocalStoreFromStorage;
 }());

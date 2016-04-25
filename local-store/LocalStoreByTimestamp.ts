@@ -10,8 +10,8 @@ import UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
 class LocalStoreByTimestamp implements UniqueStore {
     private static _defaultInst: LocalStoreByTimestamp;
 
-    static getDefaultInst(localStore: LocalStore, extractKeyId?: (key: string) => number, logInfo?: boolean, removeRatio?: number) {
-        var clearer = new ClearFullStore(extractKeyId, removeRatio);
+    static getDefaultInst(localStore: LocalStore, extractKeyId?: (key: string) => number, itemsRemovedCallback?: ItemsRemovedCallback, logInfo?: boolean, removeRatio?: number) {
+        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removeRatio);
         return LocalStoreByTimestamp._defaultInst || (LocalStoreByTimestamp._defaultInst = new LocalStoreByTimestamp(localStore, () => {
             // work around for the granularity of Date.now() and the rollover issue with performance.now()
             return UniqueChronologicalKeys.uniqueTimestamp() + "";
@@ -94,8 +94,8 @@ class LocalStoreByTimestamp implements UniqueStore {
      * @param [logInfo] whether to log full store clearing events to the key-value store
      * @param [removeRatio] the percentage of items to remove from the store when it's full
      */
-    public static newUniqueTimestampInst(localStore: LocalStore, extractKeyId: (key: string) => number, logInfo?: boolean, removePercentage?: number) {
-        var clearer = new ClearFullStore(extractKeyId, removePercentage);
+    public static newUniqueTimestampInst(localStore: LocalStore, extractKeyId: (key: string) => number, itemsRemovedCallback?: ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
+        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removePercentage);
         return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, (storeInst, err) => clearer.clearOldItems(storeInst, logInfo, err));
     }
 

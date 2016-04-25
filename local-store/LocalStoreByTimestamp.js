@@ -13,8 +13,8 @@ var LocalStoreByTimestamp = (function () {
         this.handleFullStore = handleFullStore;
         this.keyGenerator = keyGenerator;
     }
-    LocalStoreByTimestamp.getDefaultInst = function (localStore, extractKeyId, logInfo, removeRatio) {
-        var clearer = new ClearFullStore(extractKeyId, removeRatio);
+    LocalStoreByTimestamp.getDefaultInst = function (localStore, extractKeyId, itemsRemovedCallback, logInfo, removeRatio) {
+        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removeRatio);
         return LocalStoreByTimestamp._defaultInst || (LocalStoreByTimestamp._defaultInst = new LocalStoreByTimestamp(localStore, function () {
             // work around for the granularity of Date.now() and the rollover issue with performance.now()
             return UniqueChronologicalKeys.uniqueTimestamp() + "";
@@ -69,8 +69,8 @@ var LocalStoreByTimestamp = (function () {
      * @param [logInfo] whether to log full store clearing events to the key-value store
      * @param [removeRatio] the percentage of items to remove from the store when it's full
      */
-    LocalStoreByTimestamp.newUniqueTimestampInst = function (localStore, extractKeyId, logInfo, removePercentage) {
-        var clearer = new ClearFullStore(extractKeyId, removePercentage);
+    LocalStoreByTimestamp.newUniqueTimestampInst = function (localStore, extractKeyId, itemsRemovedCallback, logInfo, removePercentage) {
+        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removePercentage);
         return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, function (storeInst, err) { return clearer.clearOldItems(storeInst, logInfo, err); });
     };
     return LocalStoreByTimestamp;

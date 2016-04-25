@@ -51,9 +51,9 @@ var LocalStoreByCategory;
         Builder.prototype.build = function () {
             return new LocalStoreByCategory(this.storeInst, this.keyGenerator, this.stores);
         };
-        Builder.prototype.toStore = function (categorizer, maxValueSizeBytes, removePercentage) {
+        Builder.prototype.toStore = function (categorizer, itemsRemovedCallback, maxValueSizeBytes, removePercentage) {
             var _this = this;
-            var fullStoreHandler = new ClearFullStore(function (key) { return Number.parseInt(categorizer.unmodifyKey(key)); }, removePercentage);
+            var fullStoreHandler = ClearFullStore.newInst(function (key) { return Number.parseInt(categorizer.unmodifyKey(key)); }, itemsRemovedCallback, removePercentage);
             var fullStoreHandlerFunc = function (storeInst, err) { return fullStoreHandler.clearOldItems(storeInst, false, err); };
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, function (key) { return categorizer.isMatchingCategory(key); });
             return new LocalStoreByTimestamp(storeWrapper, function () { return categorizer.modifyKey(_this.keyGenerator() + ''); }, fullStoreHandlerFunc);

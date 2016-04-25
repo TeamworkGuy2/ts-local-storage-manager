@@ -5,13 +5,20 @@ import LocalStoreWrapper = require("../../local-store/LocalStoreWrapper");
 import ClearFullStore = require("../../local-store/ClearFullStore");
 import CommonStorageTests = require("./CommonStorageTests");
 
-QUnit.module("LocalStoreDefault", {
+
+function simpleStringHashCode(str: string): number {
+    return (str.length > 0 ? str.charCodeAt(0) << 16 : 0) +
+        (str.length > 1 ? str.charCodeAt(1) : 0);
+}
+
+
+QUnit.module("LocalStoreFromStorage", {
 });
 
 
-QUnit.test("local-store-from-storage-1", function LocalStoreDefaultScenario1Test(sr) {
+QUnit.test("local-store-from-storage-1", function LocalStoreFromStorageScenario1Test(sr) {
     var memBaseStore = MemoryStore.newInst();
-    var store = LocalStoreFromStorage.newInst(memBaseStore, null, true, true, 20, false);
+    var store = LocalStoreFromStorage.newInst(memBaseStore, null, null, true, true, 20, false);
 
     sr.equal(store.getItem("a"), null);
 
@@ -48,14 +55,69 @@ QUnit.test("local-store-from-storage-1", function LocalStoreDefaultScenario1Test
 });
 
 
-QUnit.test("local-store-from-storage-load-existing", function LocalStoreDefaultLoadExisting(sr) {
-    var fullStoreHandler = new ClearFullStore((key) => (key.length > 0 ? key.charCodeAt(0) << 16 : 0) + (key.length > 1 ? key.charCodeAt(1) : 0));
-    var baseStore = LocalStoreFromStorage.newInst(MemoryStore.newInst(), null, true, false, 50, false);
+QUnit.test("local-store-from-storage-clear-full", function LocalStoreFromStorageClearFull(sr) {
+    var itemsRemovedFunc: ItemsRemovedCallback;
+    var removePercentage = 0.49;
+    var memStore = MemoryStore.newInst(undefined, 3);
+    var fullStoreHandler = ClearFullStore.newInst((key) => parseInt(key.substr(key.lastIndexOf('-') + 1)), (store, items, err, removedCount) => itemsRemovedFunc(store, items, err, removedCount), removePercentage);
+    var baseStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
+    // ---- test exceeding max items and removing 1 item ----
+    // assuming removal-percentage-when-full is less than 50%
+    baseStore.setItem("one-123", { value: "one" });
+    baseStore.setItem("two-22", { value: "two" });
+    baseStore.setItem("three-300", { value: "three" });
+
+    var store = LocalStoreWrapper.newInst(baseStore, (store, err) => fullStoreHandler.clearOldItems(store, true, err), true, true, undefined, true);
+    // setup a local store full callback which sets the 'errorRef' variable
+    var errorRef: ItemsRemovedEvent = null;
+    itemsRemovedFunc = (store, removedItems, storageError, removedCount) => {
+        errorRef = { store, removedItems, storageError, removedCount };
+    };
+
+    // add the fourth item, exceeding the 3 item limit, the error callback should be called
+    store.setItem("four-40", { value: "four" });
+
+    sr.notEqual(errorRef, null);
+    sr.equal(errorRef.store, store);
+    checkStoreFullErrorData(sr, errorRef, {
+        "two-22": { value: "two" }
+    });
+    errorRef = null;
+
+    // add another item, exceeding the 3 item limit again
+    store.setItem("five-55", { value: "five" });
+
+    sr.notEqual(errorRef, null);
+    checkStoreFullErrorData(sr, errorRef, {
+        "four-40": { value: "four" }
+    });
+    errorRef = null;
+
+    // add two items, exceeding the 4 item limit
+    sr.deepEqual(store.getKeys().sort(), ["five-55", "one-123", "three-300"]);
+    memStore.setValidation(undefined, 4);
+    store.setItem("six-60", { value: "six" });
+    sr.equal(errorRef, null);
+    store.setItem("seven-7", { value: "seven" });
+
+    sr.notEqual(errorRef, null);
+    checkStoreFullErrorData(sr, errorRef, {
+        "five-55": { value: "five" },
+        "six-60": { value: "six" }
+    });
+
+    sr.deepEqual(store.getKeys().sort(), ["one-123", "seven-7", "three-300"]);
+});
+
+
+QUnit.test("local-store-from-storage-load-existing", function LocalStoreFromStorageLoadExisting(sr) {
+    var fullStoreHandler = ClearFullStore.newInst((key) => (key.length > 0 ? key.charCodeAt(0) << 16 : 0) + (key.length > 1 ? key.charCodeAt(1) : 0));
+    var baseStore = LocalStoreFromStorage.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
     baseStore.setItem("one", { value: "one" });
     baseStore.setItem("two", { value: "two" });
     baseStore.setItem("three", { value: "three" });
 
-    var wrapper1 = LocalStoreWrapper.newInst(baseStore, (store, err) => fullStoreHandler.clearOldItems(baseStore, true, err), true, true, undefined, true);
+    var wrapper1 = LocalStoreWrapper.newInst(baseStore, (store, err) => fullStoreHandler.clearOldItems(store, true, err), true, true, undefined, true);
     sr.deepEqual(wrapper1.getKeys().sort(), baseStore.getKeys().sort());
     // modify an item
     wrapper1.setItem("one", { value: "1" });
@@ -67,3 +129,19 @@ QUnit.test("local-store-from-storage-load-existing", function LocalStoreDefaultL
     baseStore.setItem("five", { value: "five" });
     sr.equal(wrapper1.getKeys().indexOf("five") < 0, baseStore.getKeys().indexOf("five") > -1);
 });
+
+
+function checkStoreFullErrorData(sr: QUnitAssert, errRef: ItemsRemovedEvent, expectedItems: { [key: string]: any }) {
+    sr.notEqual(errRef, null);
+    var expectedKeys = Object.keys(expectedItems);
+    sr.equal(errRef.removedItems.length, expectedKeys.length, "expected " + expectedKeys.length + " error items, received " + errRef.removedItems.length);
+
+    for (var i = 0, size = expectedKeys.length; i < size; i++) {
+        var key = expectedKeys[i];
+        var errItem = errRef.removedItems[i];
+        sr.equal(errItem.key, key, "keys mismatch: actual=" + errItem.key + ", expected=" + key + ",\n\t" +
+            "removed keys: " + errRef.removedItems.map(s => s.key).join(",") + ",\n\t" +
+            "removed count: " + errRef.removedCount);
+        sr.deepEqual(errItem.value, expectedItems[key]);
+    }
+}

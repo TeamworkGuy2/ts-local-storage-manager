@@ -116,6 +116,29 @@ declare interface KeyCategorizer {
 }
 
 
+interface RemovedItem {
+    key: string;
+    value: any;
+    keyId: number;
+}
+
+
+interface ItemsRemovedEvent {
+    store: LocalStore;
+    removedItems: RemovedItem[];
+    storageError: {
+        message: string;
+        error: any;
+    };
+    removedCount: number;
+}
+
+
 declare interface FullStoreHandler {
-    (storeInst: LocalStore, err: any): void;
+    (storeI: LocalStore, err: any): void;
+}
+
+
+declare interface ItemsRemovedCallback {
+    (store: LocalStore, removedItems: RemovedItem[], storageError: { message: string; error: any; }, removedCount: number): void;
 }

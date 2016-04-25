@@ -4,12 +4,36 @@
  * @since 2016-3-26
  */
 var MemoryStore = (function () {
-    function MemoryStore() {
+    /**
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    function MemoryStore(maxDataSize, maxItems) {
         this.data = {};
         this.len = 0;
         this.keys = [];
         this.modCount = 0;
+        this.setValidation(maxDataSize, maxItems);
     }
+    /**
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    MemoryStore.prototype.setValidation = function (maxDataSize, maxItems) {
+        var _this = this;
+        if (maxDataSize != null || maxItems != null) {
+            if (maxDataSize != null) {
+                this.validateBeforeSet = function (key, value, existingValue) {
+                    return _this.totalDataSize + value.length - (existingValue !== undefined ? existingValue.length : 0) <= maxDataSize;
+                };
+            }
+            else if (maxItems != null) {
+                this.validateBeforeSet = function (key, value, existingValue) {
+                    return _this.len + (existingValue === undefined ? 1 : 0) <= maxItems;
+                };
+            }
+        }
+    };
     Object.defineProperty(MemoryStore.prototype, "length", {
         get: function () { return this.len; },
         enumerable: true,
@@ -45,6 +69,10 @@ var MemoryStore = (function () {
         key = key === undefined ? "undefined" : (key === null ? "null" : key);
         var existingData = this.data[key];
         var dataStr = data === undefined ? "undefined" : (data === null ? "null" : data.toString());
+        var allow = this.validateBeforeSet == null || this.validateBeforeSet(key, dataStr, existingData);
+        if (!allow) {
+            throw new Error("in-memory store size limit quota reached");
+        }
         this.data[key] = dataStr;
         this.logItemAdded(key, dataStr, existingData);
     };
@@ -88,8 +116,12 @@ var MemoryStore = (function () {
             keys.pop();
         }
     };
-    MemoryStore.newInst = function () {
-        return new MemoryStore();
+    /** Create a memory store with optional limits on the stored data
+     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     */
+    MemoryStore.newInst = function (maxDataSize, maxItems) {
+        return new MemoryStore(maxDataSize, maxItems);
     };
     return MemoryStore;
 }());
