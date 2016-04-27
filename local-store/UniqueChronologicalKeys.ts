@@ -1,5 +1,5 @@
 ﻿
-declare var GLOBAL: { process: { hrtime(time?: number[]): number[]; } };
+declare var GLOBAL: { process: { hrtime(time?: number[]): [number, number]; } };
 
 /** Functions for creating relatively unique, chronological keys
  * @author TeamworkGuy2

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project does its best to adhere to [Semantic Versioning](http://semver.org/).
 
 
+#### [Unrleased]
+* Clarified GLOBAL type
+
+
 --------
 ### [0.4.0](N/A) - 2016-04-26
 #### Changed
