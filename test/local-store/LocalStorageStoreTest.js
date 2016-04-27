@@ -1,6 +1,6 @@
 "use strict";
 var MemoryStore = require("../../local-store/MemoryStore");
-var LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
+var LocalStorageStore = require("../../local-store/LocalStorageStore");
 var LocalStoreWrapper = require("../../local-store/LocalStoreWrapper");
 var ClearFullStore = require("../../local-store/ClearFullStore");
 var CommonStorageTests = require("./CommonStorageTests");
@@ -8,10 +8,10 @@ function simpleStringHashCode(str) {
     return (str.length > 0 ? str.charCodeAt(0) << 16 : 0) +
         (str.length > 1 ? str.charCodeAt(1) : 0);
 }
-QUnit.module("LocalStoreFromStorage", {});
-QUnit.test("local-store-from-storage-1", function LocalStoreFromStorageScenario1Test(sr) {
+QUnit.module("LocalStorageStore", {});
+QUnit.test("local-store-from-storage-1", function LocalStorageStoreScenario1Test(sr) {
     var memBaseStore = MemoryStore.newInst();
-    var store = LocalStoreFromStorage.newInst(memBaseStore, null, null, true, true, 20, false);
+    var store = LocalStorageStore.newInst(memBaseStore, null, null, true, true, 20, false);
     sr.equal(store.getItem("a"), null);
     store.setItem("b", { b: 1 });
     store.setItem("a", { a: 1 });
@@ -35,12 +35,12 @@ QUnit.test("local-store-from-storage-1", function LocalStoreFromStorageScenario1
     CommonStorageTests.cornerCaseKeyNames(sr, store, true);
     sr.throws(function () { return store.setItem("long-key", "abcdefghijklmnopqrstuvwxyz"); });
 });
-QUnit.test("local-store-from-storage-clear-full", function LocalStoreFromStorageClearFull(sr) {
+QUnit.test("local-store-from-storage-clear-full", function LocalStorageStoreClearFull(sr) {
     var itemsRemovedFunc;
     var removePercentage = 0.49;
     var memStore = MemoryStore.newInst(undefined, 3);
     var fullStoreHandler = ClearFullStore.newInst(function (key) { return parseInt(key.substr(key.lastIndexOf('-') + 1)); }, function (store, items, err, removedCount) { return itemsRemovedFunc(store, items, err, removedCount); }, removePercentage);
-    var baseStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
+    var baseStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
     // ---- test exceeding max items and removing 1 item ----
     // assuming removal-percentage-when-full is less than 50%
     baseStore.setItem("one-123", { value: "one" });
@@ -80,9 +80,9 @@ QUnit.test("local-store-from-storage-clear-full", function LocalStoreFromStorage
     });
     sr.deepEqual(store.getKeys().sort(), ["one-123", "seven-7", "three-300"]);
 });
-QUnit.test("local-store-from-storage-load-existing", function LocalStoreFromStorageLoadExisting(sr) {
+QUnit.test("local-store-from-storage-load-existing", function LocalStorageStoreLoadExisting(sr) {
     var fullStoreHandler = ClearFullStore.newInst(function (key) { return (key.length > 0 ? key.charCodeAt(0) << 16 : 0) + (key.length > 1 ? key.charCodeAt(1) : 0); });
-    var baseStore = LocalStoreFromStorage.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
+    var baseStore = LocalStorageStore.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
     baseStore.setItem("one", { value: "one" });
     baseStore.setItem("two", { value: "two" });
     baseStore.setItem("three", { value: "three" });

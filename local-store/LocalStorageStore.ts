@@ -1,11 +1,25 @@
-"use strict";
-var LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
-var MemoryStore = require("./MemoryStore");
+﻿import LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
+import MemoryStore = require("./MemoryStore");
+
 /** LocalStore implementation wrapper for StorageLike objects
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
-var LocalStoreFromStorage = (function () {
+class LocalStorageStore implements LocalStore {
+    private static defaultInst: LocalStorageStore;
+    private static sessionInst: LocalStorageStore;
+
+    private MAX_ITEM_SIZE_BYTES = 1000000;
+    private store: StorageLike & { getKeys?: () => string[]; };
+    private getStoreKeys: (store: StorageLike) => string[];
+    private handleFullStore: FullStoreHandler;
+    private trackTotalSize: boolean;
+    private len: number;
+    private totalDataSize: number;
+    private modCount: number;
+    private keys: string[];
+
+
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
@@ -16,9 +30,8 @@ var LocalStoreFromStorage = (function () {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    function LocalStoreFromStorage(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
-        if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
-        this.MAX_ITEM_SIZE_BYTES = 1000000;
+    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.getStoreKeys = getStoreKeys;
         this.handleFullStore = handleFullStore;
@@ -27,74 +40,88 @@ var LocalStoreFromStorage = (function () {
         this.len = 0;
         this.keys = trackKeysAndLen ? [] : null;
         this.modCount = 0;
+
         if (loadExistingData) {
             this.loadDataFrom(store, keyFilter);
         }
     }
-    Object.defineProperty(LocalStoreFromStorage.prototype, "length", {
-        get: function () { return this.len; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(LocalStoreFromStorage.prototype, "totalSizeChars", {
-        get: function () { return this.totalDataSize; },
-        enumerable: true,
-        configurable: true
-    });
-    LocalStoreFromStorage.prototype.clear = function () {
+
+
+    public get length() { return this.len; }
+
+
+    public get totalSizeChars() { return this.totalDataSize; }
+
+
+    public clear(): void {
         this.store.clear();
         this.keys = this.keys != null ? [] : null;
         this.len = 0;
         this.totalDataSize = 0;
         this.modCount = 0;
-    };
-    LocalStoreFromStorage.prototype.key = function (index) {
+    }
+
+
+    public key(index: number): string {
         return this.store.key(index);
-    };
-    LocalStoreFromStorage.prototype.getItem = function (key, plainString) {
-        if (!key) {
-            throw new Error("cannot access item from store without an identifier key");
-        }
+    }
+
+
+    public getItem(key: string, plainString?: boolean): any {
+        if (!key) { throw new Error("cannot access item from store without an identifier key"); }
+
         var value = this.store.getItem(key);
         return plainString === true ? value : (value != null ? JSON.parse(value) : value);
-    };
-    LocalStoreFromStorage.prototype.hasItem = function (key) {
+    }
+
+
+    public hasItem(key: string): boolean {
         return this.getItem(key, true) != null;
-    };
-    LocalStoreFromStorage.prototype.setItem = function (key, value, plainString) {
+    }
+
+
+    public setItem(key: string, value: any, plainString?: boolean) {
         var jsonString = this.prepAndValidateValue(key, value, plainString);
         this.tryLogSetItem(key, jsonString);
-    };
-    LocalStoreFromStorage.prototype.removeItem = function (key, plainString) {
-        if (!key) {
-            throw new Error("cannot remove item from store without an identifier key");
-        }
+    }
+
+
+    public removeItem(key: string, plainString?: boolean): void {
+        if (!key) { throw new Error("cannot remove item from store without an identifier key"); }
+
         if (this.keys != null) {
-            var existingData = this.store.getItem(key);
+            var existingData = <string>this.store.getItem(key);
             this.logItemRemoved(key, existingData);
         }
+
         this.store.removeItem(key);
-    };
-    LocalStoreFromStorage.prototype.getKeys = function () {
+    }
+
+
+    public getKeys(): string[] {
         var store = this.store;
         return this.keys != null ? this.keys : (store.getKeys ? store.getKeys() : (this.getStoreKeys ? this.getStoreKeys(store) : Object.keys(store)));
-    };
-    LocalStoreFromStorage.prototype.getData = function (plainString) {
+    }
+
+
+    public getData(plainString?: boolean): any[] {
         var store = this.store;
-        var resData = [];
+        var resData: any[] = [];
         for (var i = 0, size = store.length; i < size; i++) {
             resData.push(this.getItem(store.key(i), plainString));
         }
         return resData;
-    };
-    LocalStoreFromStorage.prototype.prepAndValidateValue = function (key, value, plainString) {
-        if (!key) {
-            throw new Error("cannot store item without an identifier key");
-        }
+    }
+
+
+    private prepAndValidateValue(key: string, value: any, plainString: boolean) {
+        if (!key) { throw new Error("cannot store item without an identifier key"); }
+
         if (plainString === true && typeof value !== "string") {
             throw new Error("local store value = '" + value + "', plain string = true, but value is not a string");
         }
-        var jsonString = plainString === true ? value : JSON.stringify(value);
+        var jsonString = plainString === true ? <string>value : JSON.stringify(value);
+
         if (jsonString.length > this.MAX_ITEM_SIZE_BYTES) {
             var errMsg = "attempting to save a local store value large than the specified limit of " + this.MAX_ITEM_SIZE_BYTES + ", key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
             if (console && typeof console.error === "function") {
@@ -103,27 +130,29 @@ var LocalStoreFromStorage = (function () {
             throw new Error(errMsg);
         }
         return jsonString;
-    };
-    LocalStoreFromStorage.prototype.tryLogSetItem = function (key, value, retryAttempts) {
-        if (retryAttempts === void 0) { retryAttempts = 1; }
+    }
+
+
+    private tryLogSetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
                 if (this.keys != null) {
-                    var existingData = this.store.getItem(key);
+                    var existingData = <string>this.store.getItem(key);
                 }
+
                 // try setting the value (possibly multiple times)
                 this.store.setItem(key, value);
+
                 if (this.keys != null) {
                     this.logItemAdded(key, value, existingData);
                 }
+
                 return;
-            }
-            catch (err) {
+            } catch (err) {
                 try {
                     // clean out old data in-case the error was the local store running out of space, if the full store handle is null, just let that generate a null error
                     this.handleFullStore(this, err);
-                }
-                catch (e2) {
+                } catch (e2) {
                     if (attempt >= retryAttempts) {
                         var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' in key-value store;" +
                             "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + ", but clearing old data from the store threw another error: " + err;
@@ -135,9 +164,11 @@ var LocalStoreFromStorage = (function () {
                 }
             }
         }
-    };
-    LocalStoreFromStorage.prototype.logItemAdded = function (key, value, existingValue) {
-        if (existingValue === undefined) {
+    }
+
+
+    private logItemAdded(key: string, value: string, existingValue: string): void {
+        if (existingValue == null) {
             this.len++;
             this.modCount++;
             this.keys.push(key);
@@ -150,9 +181,11 @@ var LocalStoreFromStorage = (function () {
         if (this.trackTotalSize) {
             this.totalDataSize += value.length;
         }
-    };
-    LocalStoreFromStorage.prototype.logItemRemoved = function (key, existingValue) {
-        if (existingValue !== undefined) {
+    }
+
+
+    private logItemRemoved(key: string, existingValue: string): void {
+        if (existingValue != null) {
             this.len--;
             if (this.trackTotalSize) {
                 this.totalDataSize -= existingValue.length;
@@ -160,8 +193,10 @@ var LocalStoreFromStorage = (function () {
             this.modCount++;
             MemoryStore.removeAryItem(key, this.keys);
         }
-    };
-    LocalStoreFromStorage.prototype.loadDataFrom = function (store, keyFilter) {
+    }
+
+
+    private loadDataFrom(store: StorageLike & { getKeys?: () => string[]; }, keyFilter?: (key: string) => boolean): void {
         var keys = store.getKeys ? store.getKeys() : Object.keys(store);
         for (var i = 0, size = keys.length; i < size; i++) {
             var key = keys[i];
@@ -169,7 +204,9 @@ var LocalStoreFromStorage = (function () {
                 this.logItemAdded(key, store.getItem(key), undefined);
             }
         }
-    };
+    }
+
+
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param getStoreKeys a function that gets the keys from the 'store'
@@ -179,20 +216,25 @@ var LocalStoreFromStorage = (function () {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    LocalStoreFromStorage.newInst = function (store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
-        if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
-        return new LocalStoreFromStorage(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
-    };
-    LocalStoreFromStorage.getDefaultInst = function (itemsRemovedCallback) {
-        return LocalStoreFromStorage.defaultInst || (LocalStoreFromStorage.defaultInst = new LocalStoreFromStorage(localStorage, null, function (store, err) {
+    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
+        return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
+    }
+
+
+    public static getDefaultInst(itemsRemovedCallback?: ItemsRemovedCallback) {
+        return LocalStorageStore.defaultInst || (LocalStorageStore.defaultInst = new LocalStorageStore(localStorage, null, (store, err) => {
             LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
-    };
-    LocalStoreFromStorage.getSessionInst = function (itemsRemovedCallback) {
-        return LocalStoreFromStorage.sessionInst || (LocalStoreFromStorage.sessionInst = new LocalStoreFromStorage(sessionStorage, null, function (store, err) {
+    }
+
+
+    public static getSessionInst(itemsRemovedCallback?: ItemsRemovedCallback) {
+        return LocalStorageStore.sessionInst || (LocalStorageStore.sessionInst = new LocalStorageStore(sessionStorage, null, (store, err) => {
             LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
-    };
-    return LocalStoreFromStorage;
-}());
-module.exports = LocalStoreFromStorage;
+    }
+
+}
+
+export = LocalStorageStore;

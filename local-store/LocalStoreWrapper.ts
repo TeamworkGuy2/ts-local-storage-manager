@@ -169,7 +169,7 @@ class LocalStoreWrapper implements LocalStore {
 
 
     private logItemAdded(key: string, value: string, existingValue: string): void {
-        if (existingValue === undefined) {
+        if (existingValue == null) {
             this.len++;
             this.modCount++;
             this.keys.push(key);
@@ -186,7 +186,7 @@ class LocalStoreWrapper implements LocalStore {
 
 
     private logItemRemoved(key: string, existingValue: string): void {
-        if (existingValue !== undefined) {
+        if (existingValue != null) {
             this.len--;
             if (this.trackTotalSize) {
                 this.totalDataSize -= existingValue.length;

@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.3.0](N/A) - 2016-04-24
+### [0.4.0](N/A) - 2016-04-26
+#### Changed
+Renamed the project from ts-local-store-and-more -> ts-local-storage-manager
+
+
+--------
+### [0.3.0](https://github.com/TeamworkGuy2/ts-local-store-and-more/commit/187736587f459758ff6e8e997f925da5a814b13e) - 2016-04-24
 #### Added
 * MemoryStore validation parameters to limit total size of data in the store or limit the number of items in the store
 

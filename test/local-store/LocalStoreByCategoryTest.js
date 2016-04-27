@@ -2,11 +2,11 @@
 var LocalStoreByCategory = require("../../local-store/LocalStoreByCategory");
 var UniqueChronologicalKeys = require("../../local-store/UniqueChronologicalKeys");
 var MemoryStore = require("../../local-store/MemoryStore");
-var LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
+var LocalStorageStore = require("../../local-store/LocalStorageStore");
 var BasicCategorizers = require("../../local-store/BasicCategorizers");
 var CommonStorageTests = require("./CommonStorageTests");
 var memStore = MemoryStore.newInst();
-var localStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
+var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
 var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
 var store = storeBldr.addStores({
     alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),

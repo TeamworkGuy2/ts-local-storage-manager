@@ -1,6 +1,6 @@
 ﻿"use strict";
 import MemoryStore = require("../../local-store/MemoryStore");
-import LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
+import LocalStorageStore = require("../../local-store/LocalStorageStore");
 import LocalStoreWrapper = require("../../local-store/LocalStoreWrapper");
 import ClearFullStore = require("../../local-store/ClearFullStore");
 import CommonStorageTests = require("./CommonStorageTests");
@@ -12,13 +12,13 @@ function simpleStringHashCode(str: string): number {
 }
 
 
-QUnit.module("LocalStoreFromStorage", {
+QUnit.module("LocalStorageStore", {
 });
 
 
-QUnit.test("local-store-from-storage-1", function LocalStoreFromStorageScenario1Test(sr) {
+QUnit.test("local-store-from-storage-1", function LocalStorageStoreScenario1Test(sr) {
     var memBaseStore = MemoryStore.newInst();
-    var store = LocalStoreFromStorage.newInst(memBaseStore, null, null, true, true, 20, false);
+    var store = LocalStorageStore.newInst(memBaseStore, null, null, true, true, 20, false);
 
     sr.equal(store.getItem("a"), null);
 
@@ -55,12 +55,12 @@ QUnit.test("local-store-from-storage-1", function LocalStoreFromStorageScenario1
 });
 
 
-QUnit.test("local-store-from-storage-clear-full", function LocalStoreFromStorageClearFull(sr) {
+QUnit.test("local-store-from-storage-clear-full", function LocalStorageStoreClearFull(sr) {
     var itemsRemovedFunc: ItemsRemovedCallback;
     var removePercentage = 0.49;
     var memStore = MemoryStore.newInst(undefined, 3);
     var fullStoreHandler = ClearFullStore.newInst((key) => parseInt(key.substr(key.lastIndexOf('-') + 1)), (store, items, err, removedCount) => itemsRemovedFunc(store, items, err, removedCount), removePercentage);
-    var baseStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
+    var baseStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
     // ---- test exceeding max items and removing 1 item ----
     // assuming removal-percentage-when-full is less than 50%
     baseStore.setItem("one-123", { value: "one" });
@@ -110,9 +110,9 @@ QUnit.test("local-store-from-storage-clear-full", function LocalStoreFromStorage
 });
 
 
-QUnit.test("local-store-from-storage-load-existing", function LocalStoreFromStorageLoadExisting(sr) {
+QUnit.test("local-store-from-storage-load-existing", function LocalStorageStoreLoadExisting(sr) {
     var fullStoreHandler = ClearFullStore.newInst((key) => (key.length > 0 ? key.charCodeAt(0) << 16 : 0) + (key.length > 1 ? key.charCodeAt(1) : 0));
-    var baseStore = LocalStoreFromStorage.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
+    var baseStore = LocalStorageStore.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
     baseStore.setItem("one", { value: "one" });
     baseStore.setItem("two", { value: "two" });
     baseStore.setItem("three", { value: "three" });

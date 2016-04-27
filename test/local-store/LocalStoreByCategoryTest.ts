@@ -3,7 +3,7 @@ import ClearFullStore = require("../../local-store/ClearFullStore");
 import LocalStoreByCategory = require("../../local-store/LocalStoreByCategory");
 import UniqueChronologicalKeys = require("../../local-store/UniqueChronologicalKeys");
 import MemoryStore = require("../../local-store/MemoryStore");
-import LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
+import LocalStorageStore = require("../../local-store/LocalStorageStore");
 import BasicCategorizers = require("../../local-store/BasicCategorizers");
 import CommonStorageTests = require("./CommonStorageTests");
 
@@ -15,7 +15,7 @@ interface CategoryEvent {
 }
 
 var memStore = MemoryStore.newInst();
-var localStore = LocalStoreFromStorage.newInst(memStore, null, null, true, false, 80, false);
+var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
 var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
 var store = storeBldr.addStores({
     alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),

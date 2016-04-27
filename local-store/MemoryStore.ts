@@ -105,8 +105,7 @@ class MemoryStore implements StorageLike {
 
 
     private logItemAdded(key: string, value: string, existingValue: string): void {
-        var exists = existingValue !== undefined;
-        if (!exists) {
+        if (existingValue === undefined) {
             this.len++;
             this.modCount++;
             this.keys.push(key);
@@ -119,9 +118,7 @@ class MemoryStore implements StorageLike {
 
 
     private logItemRemoved(key: string, existingValue: string): void {
-        var exists = existingValue !== undefined;
-
-        if (exists) {
+        if (existingValue !== undefined) {
             this.len--;
             this.totalDataSize -= existingValue.length;
             this.modCount++;

@@ -80,8 +80,7 @@ var MemoryStore = (function () {
         return this.keys;
     };
     MemoryStore.prototype.logItemAdded = function (key, value, existingValue) {
-        var exists = existingValue !== undefined;
-        if (!exists) {
+        if (existingValue === undefined) {
             this.len++;
             this.modCount++;
             this.keys.push(key);
@@ -92,8 +91,7 @@ var MemoryStore = (function () {
         this.totalDataSize += value.length;
     };
     MemoryStore.prototype.logItemRemoved = function (key, existingValue) {
-        var exists = existingValue !== undefined;
-        if (exists) {
+        if (existingValue !== undefined) {
             this.len--;
             this.totalDataSize -= existingValue.length;
             this.modCount++;

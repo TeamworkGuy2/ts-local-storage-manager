@@ -1,6 +1,6 @@
 {
-  "name": "ts-local-store-and-more",
-  "version": "0.3.0",
+  "name": "ts-local-storage-manager",
+  "version": "0.4.0",
   "description": "TypeScript wrappers and implementations for javascript 'Storage' (i.e. localStorage/sessionStorage) type objects",
   "author": "TeamworkGuy2",
   "license": "MIT",

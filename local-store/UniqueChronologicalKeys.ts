@@ -1,4 +1,7 @@
-﻿/** Functions for creating relatively unique, chronological keys
+﻿
+declare var GLOBAL: { process: { hrtime(time?: number[]): number[]; } };
+
+/** Functions for creating relatively unique, chronological keys
  * @author TeamworkGuy2
  * @since 2016-3-26
  */

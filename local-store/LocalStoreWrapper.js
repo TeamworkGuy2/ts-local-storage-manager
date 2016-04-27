@@ -142,7 +142,7 @@ var LocalStoreWrapper = (function () {
         }
     };
     LocalStoreWrapper.prototype.logItemAdded = function (key, value, existingValue) {
-        if (existingValue === undefined) {
+        if (existingValue == null) {
             this.len++;
             this.modCount++;
             this.keys.push(key);
@@ -157,7 +157,7 @@ var LocalStoreWrapper = (function () {
         }
     };
     LocalStoreWrapper.prototype.logItemRemoved = function (key, existingValue) {
-        if (existingValue !== undefined) {
+        if (existingValue != null) {
             this.len--;
             if (this.trackTotalSize) {
                 this.totalDataSize -= existingValue.length;

@@ -2,7 +2,7 @@
 import LocalStoreByTimestamp = require("../../local-store/LocalStoreByTimestamp");
 import UniqueChronologicalKeys = require("../../local-store/UniqueChronologicalKeys");
 import MemoryStore = require("../../local-store/MemoryStore");
-import LocalStoreFromStorage = require("../../local-store/LocalStoreFromStorage");
+import LocalStorageStore = require("../../local-store/LocalStorageStore");
 import CommonStorageTests = require("./CommonStorageTests");
 
 QUnit.module("LocalStoreByTimestamp", {
@@ -11,7 +11,7 @@ QUnit.module("LocalStoreByTimestamp", {
 
 QUnit.test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test(sr) {
     var memStore = MemoryStore.newInst();
-    var localStore = LocalStoreFromStorage.newInst(memStore, null, null, false, false, 20);
+    var localStore = LocalStorageStore.newInst(memStore, null, null, false, false, 20);
     var store = LocalStoreByTimestamp.newUniqueTimestampInst(localStore, Number.parseInt);
     store.keyGenerator = UniqueChronologicalKeys.uniqueTimestampNodeJs;
 
