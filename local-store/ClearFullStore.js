@@ -28,7 +28,7 @@ var ClearFullStore = (function () {
         if (logInfo) {
             var end = UniqueChronologicalKeys.getMillisecondTime();
         }
-        if (this.itemsRemovedCallback) {
+        if (this.itemsRemovedCallback && removedItems.removedCount > 0) {
             this.itemsRemovedCallback(store, removedItems.items, {
                 error: err,
                 message: "removed " + removedItems.items.length + " local store entries" + (start || end ? " in " + Math.round(end - start) + " ms" : "") + ", " +

@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project does its best to adhere to [Semantic Versioning](http://semver.org/).
 
-#### [Unreleased]
-* Fixed LocalStorageStoreTest issue
+
+--------
+### [0.5.1](N/A) - 2016-05-03
+#### Changed
+* ClearFullStore itemsRemovedCallback changed to not get called when 0 items are removed from a store
+* Improved some test cases
 
 
 --------
@@ -19,6 +23,10 @@ LocalStoreByCategory internal handling for full stores, now all category stores 
 
 #### Removed
 LocalStoreByTimestamp.getDefaultInst() - you really should create your own
+
+#### Fixed
+* LocalStorageStoreTest issue caused by ClearFullStore itemsRemovedCallback changed to return string values
+* LocalStoreWrapper setItem() and removeItem() double stringify/parsing
 
 
 --------

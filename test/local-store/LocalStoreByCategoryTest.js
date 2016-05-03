@@ -62,13 +62,13 @@ QUnit.test("local-store-by-category-1", function LocalStoreByCategoryScenario1Te
     sr.equal(store.stores.omega.hasItem(keyO1), true);
     sr.equal(store.stores.omega.hasItem(keyO2), true);
     sr.equal(store.rootStore.hasItem("-"), false);
-    assertDataStores(sr, store, [
+    assertDataStores(sr, store, false, compareCategoryEvent, [
         { name: "alpha", size: 2, data: [valB, valC] },
         { name: "omega", size: 2, data: [valD, valE] },
     ]);
     //sr.equal(store.length, 5);
     store.stores.alpha.removeItem(keyA1);
-    assertDataStores(sr, store, [
+    assertDataStores(sr, store, false, compareCategoryEvent, [
         { name: "alpha", size: 1, data: [valC] },
         { name: "omega", size: 2, data: [valD, valE] },
     ]);
@@ -87,15 +87,25 @@ QUnit.test("local-store-by-category-full-1", function localStoreByCategoryFullTe
     store.stores.charlie.addItem("five-", true);
     store.stores.delta.addItem("too-long", true);
     sr.equal(cI, 1);
+    sr.equal(dI, 0);
+    assertDataStores(sr, store, true, function (s1, s2) { return s1 === s2; }, [
+        { name: "delta", size: 1, data: ["too-long"] },
+    ]);
+    store.stores.charlie.addItem("A", true);
+    sr.equal(cI, 1);
+    sr.equal(dI, 0);
+    // charlie: ["five-", "A"]
+    // delta: ["too-long"]
+    store.stores.delta.addItem("two", true);
+    sr.equal(cI, 2);
     sr.equal(dI, 1);
-    //assertDataStores(sr, store, [
-    //    { name: "charlie", size: 0, data: [] },
-    //    { name: "delta", size: 0, data: [] },
-    //]);
+    assertDataStores(sr, store, true, function (s1, s2) { return s1 === s2; }, [
+        { name: "delta", size: 1, data: ["two"] },
+    ]);
 });
 /** Check that the TestStore contains the expected stores with expected sizes and data
  */
-function assertDataStores(sr, store, expectedSubStores) {
+function assertDataStores(sr, store, plainStr, compare, expectedSubStores) {
     var stores = store.getStoresContainingData();
     var names = [];
     for (var i = 0, size = expectedSubStores.length; i < size; i++) {
@@ -106,7 +116,8 @@ function assertDataStores(sr, store, expectedSubStores) {
         sr.equal(categoryStore.length, expected.size, "invalid store size: " + expected.name);
         if (expected.data && expected.data.length > 0) {
             for (var k = 0, sizeK = expected.data.length; k < sizeK; k++) {
-                sr.equal(CommonStorageTests.looseEqual(compareCategoryEvent, categoryStore.getData(), expected.data), true, "expected: " + JSON.stringify(expected.data) + ", actual: " + JSON.stringify(categoryStore.getData()));
+                var storeData = categoryStore.getData(plainStr);
+                sr.equal(CommonStorageTests.looseEqual(compare, storeData, expected.data), true, "expected: " + JSON.stringify(expected.data) + ", actual: " + JSON.stringify(storeData));
             }
         }
     }
