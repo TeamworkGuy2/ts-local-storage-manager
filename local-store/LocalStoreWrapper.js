@@ -60,14 +60,14 @@ var LocalStoreWrapper = (function () {
     };
     LocalStoreWrapper.prototype.setItem = function (key, value, plainString) {
         var jsonString = this.prepAndValidateValue(key, value, plainString);
-        this.tryLogSetItem(key, jsonString);
+        this.trySetItem(key, jsonString);
     };
     LocalStoreWrapper.prototype.removeItem = function (key, plainString) {
         if (!key) {
             throw new Error("cannot remove item from store without an identifier key");
         }
         if (this.keys != null) {
-            var existingData = this.store.getItem(key);
+            var existingData = this.store.getItem(key, true);
             this.logItemRemoved(key, existingData);
         }
         this.store.removeItem(key);
@@ -108,12 +108,12 @@ var LocalStoreWrapper = (function () {
         }
         return jsonString;
     };
-    LocalStoreWrapper.prototype.tryLogSetItem = function (key, value, retryAttempts) {
+    LocalStoreWrapper.prototype.trySetItem = function (key, value, retryAttempts) {
         if (retryAttempts === void 0) { retryAttempts = 1; }
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
                 if (this.keys != null) {
-                    var existingData = this.store.getItem(key);
+                    var existingData = this.store.getItem(key, true);
                 }
                 // try setting the value (possibly multiple times)
                 this.store.setItem(key, value, true);

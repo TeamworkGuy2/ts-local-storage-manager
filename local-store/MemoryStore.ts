@@ -17,10 +17,7 @@ class MemoryStore implements StorageLike {
      * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     constructor(maxDataSize?: number, maxItems?: number) {
-        this.data = {};
-        this.len = 0;
-        this.keys = [];
-        this.modCount = 0;
+        this.clear();
         this.setValidation(maxDataSize, maxItems);
     }
 
@@ -88,10 +85,7 @@ class MemoryStore implements StorageLike {
 
         var dataStr = data === undefined ? "undefined" : (data === null ? "null" : data.toString())
 
-        var allow = this.validateBeforeSet == null || this.validateBeforeSet(key, dataStr, existingData);
-        if (!allow) {
-            throw new Error("in-memory store size limit quota reached");
-        }
+        this.checkLimitsBeforeAdd(key, dataStr, existingData);
 
         this.data[key] = dataStr;
 
@@ -101,6 +95,16 @@ class MemoryStore implements StorageLike {
 
     public getKeys(): string[] {
         return this.keys;
+    }
+
+
+    /** Checks that default and user specified limits are enforced and throws errors otherwise
+     */
+    private checkLimitsBeforeAdd(key: string, value: string, existingValue: string): void {
+        var allow = this.validateBeforeSet == null || this.validateBeforeSet(key, value, existingValue);
+        if (!allow) {
+            throw new Error("in-memory store size limit quota reached");
+        }
     }
 
 

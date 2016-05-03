@@ -74,6 +74,27 @@ QUnit.test("local-store-by-category-1", function LocalStoreByCategoryScenario1Te
     ]);
     //sr.equal(store.length, 4);
 });
+QUnit.test("local-store-by-category-full-1", function localStoreByCategoryFullTest(sr) {
+    var cI = 0;
+    var dI = 0;
+    var memStore = MemoryStore.newInst(10);
+    var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+    var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+    var store = storeBldr.addStores({
+        charlie: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("c-"), function (storeInst, removedItems, err, removedCount) { return cI++; }),
+        delta: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("d-"), function (storeInst, removedItems, err, removedCount) { return dI++; }),
+    }).build();
+    store.stores.charlie.addItem("five-", true);
+    store.stores.delta.addItem("too-long", true);
+    sr.equal(cI, 1);
+    sr.equal(dI, 1);
+    //assertDataStores(sr, store, [
+    //    { name: "charlie", size: 0, data: [] },
+    //    { name: "delta", size: 0, data: [] },
+    //]);
+});
+/** Check that the TestStore contains the expected stores with expected sizes and data
+ */
 function assertDataStores(sr, store, expectedSubStores) {
     var stores = store.getStoresContainingData();
     var names = [];

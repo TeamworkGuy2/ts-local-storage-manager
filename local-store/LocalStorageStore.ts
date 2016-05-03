@@ -82,7 +82,7 @@ class LocalStorageStore implements LocalStore {
 
     public setItem(key: string, value: any, plainString?: boolean) {
         var jsonString = this.prepAndValidateValue(key, value, plainString);
-        this.tryLogSetItem(key, jsonString);
+        this.trySetItem(key, jsonString);
     }
 
 
@@ -133,7 +133,7 @@ class LocalStorageStore implements LocalStore {
     }
 
 
-    private tryLogSetItem(key: string, value: string, retryAttempts: number = 1): void {
+    private trySetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
                 if (this.keys != null) {
@@ -224,14 +224,14 @@ class LocalStorageStore implements LocalStore {
 
     public static getDefaultInst(itemsRemovedCallback?: ItemsRemovedCallback) {
         return LocalStorageStore.defaultInst || (LocalStorageStore.defaultInst = new LocalStorageStore(localStorage, null, (store, err) => {
-            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
     }
 
 
     public static getSessionInst(itemsRemovedCallback?: ItemsRemovedCallback) {
         return LocalStorageStore.sessionInst || (LocalStorageStore.sessionInst = new LocalStorageStore(sessionStorage, null, (store, err) => {
-            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
     }
 

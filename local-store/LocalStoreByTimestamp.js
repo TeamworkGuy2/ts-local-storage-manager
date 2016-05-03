@@ -13,13 +13,6 @@ var LocalStoreByTimestamp = (function () {
         this.handleFullStore = handleFullStore;
         this.keyGenerator = keyGenerator;
     }
-    LocalStoreByTimestamp.getDefaultInst = function (localStore, extractKeyId, itemsRemovedCallback, logInfo, removeRatio) {
-        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removeRatio);
-        return LocalStoreByTimestamp._defaultInst || (LocalStoreByTimestamp._defaultInst = new LocalStoreByTimestamp(localStore, function () {
-            // work around for the granularity of Date.now() and the rollover issue with performance.now()
-            return UniqueChronologicalKeys.uniqueTimestamp() + "";
-        }, function (storeInst, err) { return clearer.clearOldItems(storeInst, logInfo, err); }));
-    };
     Object.defineProperty(LocalStoreByTimestamp.prototype, "length", {
         get: function () { return this.storeInst.length; },
         enumerable: true,
@@ -69,9 +62,11 @@ var LocalStoreByTimestamp = (function () {
      * @param [logInfo] whether to log full store clearing events to the key-value store
      * @param [removeRatio] the percentage of items to remove from the store when it's full
      */
-    LocalStoreByTimestamp.newUniqueTimestampInst = function (localStore, extractKeyId, itemsRemovedCallback, logInfo, removePercentage) {
-        var clearer = ClearFullStore.newInst(extractKeyId, itemsRemovedCallback, removePercentage);
-        return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, function (storeInst, err) { return clearer.clearOldItems(storeInst, logInfo, err); });
+    LocalStoreByTimestamp.newTimestampInst = function (localStore, itemsRemovedCallback, logInfo, removePercentage) {
+        var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
+        return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, function (storeInst, err) {
+            clearer.clearOldItems(storeInst, logInfo, err);
+        });
     };
     return LocalStoreByTimestamp;
 }());

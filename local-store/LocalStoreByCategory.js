@@ -8,12 +8,22 @@ var ClearFullStore = require("./ClearFullStore");
  */
 var LocalStoreByCategory = (function () {
     function LocalStoreByCategory(rootStore, timestampKeyGenerator, storeMap) {
+        var _this = this;
         this.rootStore = rootStore;
         this.timestampKeyGenerator = timestampKeyGenerator;
         this.stores = {};
+        this.fullStoreHandlers = {};
+        var handleFullStore = function (store, err) {
+            _this.handleFullStores(store, err);
+        };
         var keys = Object.keys(storeMap);
+        this.storeNames = keys;
         for (var i = 0, size = keys.length; i < size; i++) {
-            this.stores[keys[i]] = storeMap[keys[i]];
+            var key = keys[i];
+            var store = storeMap[key];
+            store.handleFullStoreCallback = handleFullStore;
+            this.stores[key] = store.store;
+            this.fullStoreHandlers[key] = store;
         }
     }
     LocalStoreByCategory.prototype.getStore = function (category) {
@@ -31,6 +41,14 @@ var LocalStoreByCategory = (function () {
         }
         return storesWithData;
     };
+    LocalStoreByCategory.prototype.handleFullStores = function (store, err) {
+        // loop through and clear each store when one is full since they all share the same base store
+        for (var i = 0, size = this.storeNames.length; i < size; i++) {
+            var name = this.storeNames[i];
+            var categoryStore = this.fullStoreHandlers[name];
+            var res = categoryStore.clearFullStore.clearOldItems(categoryStore.baseStore, false, err);
+        }
+    };
     return LocalStoreByCategory;
 }());
 var LocalStoreByCategory;
@@ -40,11 +58,19 @@ var LocalStoreByCategory;
             this.storeInst = storeInst;
             this.keyGenerator = keyGenerator;
             this.stores = {};
+            this.tmpStores = [];
+            this.tmpCategoryStores = [];
         }
         Builder.prototype.addStores = function (stores) {
             var keys = Object.keys(stores);
             for (var i = 0, size = keys.length; i < size; i++) {
-                this.stores[keys[i]] = stores[keys[i]];
+                var key = keys[i];
+                var store = stores[key];
+                var idx = this.tmpStores.indexOf(store);
+                var categoryStore = this.tmpCategoryStores[idx];
+                Builder.removeIdx(this.tmpStores, idx);
+                Builder.removeIdx(this.tmpCategoryStores, idx);
+                this.stores[key] = categoryStore;
             }
             return this;
         };
@@ -53,13 +79,42 @@ var LocalStoreByCategory;
         };
         Builder.prototype.toStore = function (categorizer, itemsRemovedCallback, maxValueSizeBytes, removePercentage) {
             var _this = this;
-            var fullStoreHandler = ClearFullStore.newInst(function (key) { return Number.parseInt(categorizer.unmodifyKey(key)); }, itemsRemovedCallback, removePercentage);
-            var fullStoreHandlerFunc = function (storeInst, err) { return fullStoreHandler.clearOldItems(storeInst, false, err); };
+            var clearFullStore = ClearFullStore.newInst(function (key) { return Number.parseInt(categorizer.unmodifyKey(key)); }, itemsRemovedCallback, removePercentage);
+            var res = {
+                baseStore: null,
+                categorizer: categorizer,
+                clearFullStore: clearFullStore,
+                handleFullStore: null,
+                handleFullStoreCallback: null,
+                store: null,
+            };
+            var fullStoreHandlerFunc = function (storeInst, err) { return res.handleFullStoreCallback(storeInst, err); };
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, function (key) { return categorizer.isMatchingCategory(key); });
-            return new LocalStoreByTimestamp(storeWrapper, function () { return categorizer.modifyKey(_this.keyGenerator() + ''); }, fullStoreHandlerFunc);
+            res.handleFullStore = fullStoreHandlerFunc;
+            //res.handleFullStoreCallback = null;
+            res.baseStore = storeWrapper;
+            res.store = new LocalStoreByTimestamp(storeWrapper, function () { return categorizer.modifyKey(_this.keyGenerator() + ''); }, fullStoreHandlerFunc);
+            this.tmpStores.push(res.store);
+            this.tmpCategoryStores.push(res);
+            return res.store;
         };
         Builder.newInst = function (storeInst, keyGenerator) {
             return new Builder(storeInst, keyGenerator);
+        };
+        Builder.removeIdx = function (ary, index) {
+            if (ary == null) {
+                return ary;
+            }
+            var size = ary.length;
+            if (ary.length < 1 || index < 0 || index >= ary.length) {
+                return ary;
+            }
+            for (var i = index + 1; i < size; i++) {
+                ary[i - 1] = ary[i];
+            }
+            ary[size - 1] = null;
+            ary.length = size - 1;
+            return ary;
         };
         return Builder;
     }());

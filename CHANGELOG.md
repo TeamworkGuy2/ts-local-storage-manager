@@ -3,12 +3,22 @@ All notable changes to this project will be documented in this file.
 This project does its best to adhere to [Semantic Versioning](http://semver.org/).
 
 
-#### [Unrleased]
+--------
+### [0.5.0](N/A) - 2016-05-02
+#### Added
+LocalStoreByCategory internal handling for full stores, now all category stores are cleared when one is full to ensure enough space is freed. (possible future optimization would be to clear the store that first reported being full first and only clear further stores until enough space is available for the current operation...)
+
+#### Changed
 * Clarified GLOBAL type
+* Renamed LocalStoreByTimestamp newUniqueTimestampInst() -> newTimestampInst()
+* Renamed some private methods
+
+#### Removed
+LocalStoreByTimestamp.getDefaultInst() - you really should create your own
 
 
 --------
-### [0.4.0](N/A) - 2016-04-26
+### [0.4.0](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/146ed0656ce74fe85cb4b989acdd87687cc401d0) - 2016-04-26
 #### Changed
 Renamed the project from ts-local-store-and-more -> ts-local-storage-manager
 

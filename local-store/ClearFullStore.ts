@@ -42,6 +42,7 @@ class ClearFullStore {
                     "because local store threw error" + (err ? ": '" + err.message + "': " + JSON.stringify(err.stack) : ""),
             }, removedItems.removedCount);
         }
+
         return removedItems.items;
     }
 
@@ -74,13 +75,14 @@ class ClearFullStore {
 
         var idCount = idsKeys.length;
         maxItemsRemoved = maxItemsRemoved === undefined ? idCount : Math.min(idCount, maxItemsRemoved);
-        var removeCount = Math.max(Math.min(Math.round(idCount * removePercentage), maxItemsRemoved), minItemsRemoved);
+        var removeCount = Math.max(Math.min(Math.round(idCount * removePercentage), maxItemsRemoved), Math.min(minItemsRemoved, idCount));
         var removedItems: RemovedItem[] = [];
+
         // remove the oldest timestamped entries (always remove between [1, timestamps.length] entries)
         for (var i = 0; i < removeCount; i++) {
             var keyId = idsKeys[i];
 
-            var existingItem = localStore.getItem(keyId.key);
+            var existingItem = localStore.getItem(keyId.key, true);
             removedItems.push({
                 key: idsKeys[i].key,
                 keyId: idsKeys[i].id,

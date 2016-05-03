@@ -63,7 +63,7 @@ var LocalStorageStore = (function () {
     };
     LocalStorageStore.prototype.setItem = function (key, value, plainString) {
         var jsonString = this.prepAndValidateValue(key, value, plainString);
-        this.tryLogSetItem(key, jsonString);
+        this.trySetItem(key, jsonString);
     };
     LocalStorageStore.prototype.removeItem = function (key, plainString) {
         if (!key) {
@@ -104,7 +104,7 @@ var LocalStorageStore = (function () {
         }
         return jsonString;
     };
-    LocalStorageStore.prototype.tryLogSetItem = function (key, value, retryAttempts) {
+    LocalStorageStore.prototype.trySetItem = function (key, value, retryAttempts) {
         if (retryAttempts === void 0) { retryAttempts = 1; }
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
@@ -185,12 +185,12 @@ var LocalStorageStore = (function () {
     };
     LocalStorageStore.getDefaultInst = function (itemsRemovedCallback) {
         return LocalStorageStore.defaultInst || (LocalStorageStore.defaultInst = new LocalStorageStore(localStorage, null, function (store, err) {
-            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
     };
     LocalStorageStore.getSessionInst = function (itemsRemovedCallback) {
         return LocalStorageStore.sessionInst || (LocalStorageStore.sessionInst = new LocalStorageStore(sessionStorage, null, function (store, err) {
-            LocalStoreByTimestamp.getDefaultInst(store, Number.parseInt, itemsRemovedCallback).handleFullStore(store, err);
+            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
         }, true, true, undefined, true));
     };
     return LocalStorageStore;

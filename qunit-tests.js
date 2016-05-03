@@ -17,18 +17,22 @@ testRunner.setup({
         testing: true
     }
 });
+/*
 testRunner.run({
     code: "./local-store/LocalStorageStore",
     tests: "./test/local-store/LocalStorageStoreTest.js"
 }, callback);
+
 testRunner.run({
     code: "./local-store/MemoryStore",
     tests: "./test/local-store/MemoryStoreTest.js"
 }, callback);
+
 testRunner.run({
     code: "./local-store/LocalStoreByTimestamp",
     tests: "./test/local-store/LocalStoreByTimestampTest.js"
 }, callback);
+*/
 testRunner.run({
     code: "./local-store/LocalStoreByCategory",
     tests: "./test/local-store/LocalStoreByCategoryTest.js"

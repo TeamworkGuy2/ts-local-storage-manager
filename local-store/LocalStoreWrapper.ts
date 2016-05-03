@@ -75,7 +75,7 @@ class LocalStoreWrapper implements LocalStore {
 
     public setItem(key: string, value: any, plainString?: boolean) {
         var jsonString = this.prepAndValidateValue(key, value, plainString);
-        this.tryLogSetItem(key, jsonString);
+        this.trySetItem(key, jsonString);
     }
 
 
@@ -83,7 +83,7 @@ class LocalStoreWrapper implements LocalStore {
         if (!key) { throw new Error("cannot remove item from store without an identifier key"); }
 
         if (this.keys != null) {
-            var existingData = <string>this.store.getItem(key);
+            var existingData = <string>this.store.getItem(key, true);
             this.logItemRemoved(key, existingData);
         }
 
@@ -133,11 +133,11 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
-    private tryLogSetItem(key: string, value: string, retryAttempts: number = 1): void {
+    private trySetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
                 if (this.keys != null) {
-                    var existingData = <string>this.store.getItem(key);
+                    var existingData = <string>this.store.getItem(key, true);
                 }
 
                 // try setting the value (possibly multiple times)

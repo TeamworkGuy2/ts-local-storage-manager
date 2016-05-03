@@ -12,7 +12,7 @@ QUnit.module("LocalStoreByTimestamp", {
 QUnit.test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test(sr) {
     var memStore = MemoryStore.newInst();
     var localStore = LocalStorageStore.newInst(memStore, null, null, false, false, 20);
-    var store = LocalStoreByTimestamp.newUniqueTimestampInst(localStore, Number.parseInt);
+    var store = LocalStoreByTimestamp.newTimestampInst(localStore);
     store.keyGenerator = UniqueChronologicalKeys.uniqueTimestampNodeJs;
 
     var keyA = store.addItem({ a: 1 });
