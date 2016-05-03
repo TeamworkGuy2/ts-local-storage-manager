@@ -57,14 +57,14 @@ QUnit.test("local-store-from-storage-clear-full", function LocalStorageStoreClea
     sr.notEqual(errorRef, null);
     sr.equal(errorRef.store, store);
     checkStoreFullErrorData(sr, errorRef, {
-        "two-22": { value: "two" }
+        "two-22": JSON.stringify({ value: "two" })
     });
     errorRef = null;
     // add another item, exceeding the 3 item limit again
     store.setItem("five-55", { value: "five" });
     sr.notEqual(errorRef, null);
     checkStoreFullErrorData(sr, errorRef, {
-        "four-40": { value: "four" }
+        "four-40": JSON.stringify({ value: "four" })
     });
     errorRef = null;
     // add two items, exceeding the 4 item limit
@@ -75,8 +75,8 @@ QUnit.test("local-store-from-storage-clear-full", function LocalStorageStoreClea
     store.setItem("seven-7", { value: "seven" });
     sr.notEqual(errorRef, null);
     checkStoreFullErrorData(sr, errorRef, {
-        "five-55": { value: "five" },
-        "six-60": { value: "six" }
+        "five-55": JSON.stringify({ value: "five" }),
+        "six-60": JSON.stringify({ value: "six" })
     });
     sr.deepEqual(store.getKeys().sort(), ["one-123", "seven-7", "three-300"]);
 });
