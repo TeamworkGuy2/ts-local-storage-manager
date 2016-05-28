@@ -34,7 +34,7 @@ module BasicCategorizers {
 
     /** Default categorizer implementation
      */
-    export class DefaultCategorizer implements KeyCategorizer {
+    export class DefaultCategorizer implements LocalStore.KeyCategorizer {
         public category: string;
         public modifyKey: (key: string) => string;
         public unmodifyKey: (key: string) => string;

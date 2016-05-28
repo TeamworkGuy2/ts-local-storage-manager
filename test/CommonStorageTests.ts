@@ -12,42 +12,42 @@
 
 module CommonStorageTests {
 
-    export function addAndRemove(sr: QUnitAssert, store: StorageLikeWithKeys) {
+    export function addAndRemove(asr: Chai.AssertStatic, store: StorageLikeWithKeys) {
         store.setItem("a", "a-");
         store.setItem("2", "c-");
         store.setItem("1", "b-");
 
-        sr.deepEqual(store.getKeys(), ["a", "2", "1"]);
+        asr.deepEqual(store.getKeys(), ["a", "2", "1"]);
 
         store.removeItem("2");
 
-        sr.deepEqual(store.getKeys(), ["a", "1"]);
+        asr.deepEqual(store.getKeys(), ["a", "1"]);
 
-        sr.equal(store.length, 2);
+        asr.equal(store.length, 2);
 
         store.clear();
     }
 
 
-    export function keyAndGetItem(sr: QUnitAssert, store: StorageLikeWithKeys) {
+    export function keyAndGetItem(asr: Chai.AssertStatic, store: StorageLikeWithKeys) {
         store.setItem("c", "c-");
         store.setItem("b", "b-");
         store.setItem("a", "a-");
         store.setItem("b", "b-");
 
-        sr.deepEqual(store.getKeys(), ["c", "b", "a"]);
-        sr.equal(store.length, 3);
-        sr.equal(store.key(0), "c");
-        sr.equal(store.key(1), "b");
-        sr.equal(store.key(2), "a");
-        sr.equal(store.getItem("b"), "b-");
-        sr.equal(store.getItem("c"), "c-");
-        sr.equal(store.getItem("a"), "a-");
+        asr.deepEqual(store.getKeys(), ["c", "b", "a"]);
+        asr.equal(store.length, 3);
+        asr.equal(store.key(0), "c");
+        asr.equal(store.key(1), "b");
+        asr.equal(store.key(2), "a");
+        asr.equal(store.getItem("b"), "b-");
+        asr.equal(store.getItem("c"), "c-");
+        asr.equal(store.getItem("a"), "a-");
         store.clear();
     }
 
 
-    export function cornerCaseKeyNames(sr: QUnitAssert, store: StorageLikeWithKeys, alwaysAsString: boolean) {
+    export function cornerCaseKeyNames(asr: Chai.AssertStatic, store: StorageLikeWithKeys, alwaysAsString: boolean) {
         store.setItem("c", "c-");
         store.setItem("b", "b-");
         store.setItem(alwaysAsString ? "null" : <string>null, "none-null");
@@ -56,12 +56,12 @@ module CommonStorageTests {
         store.removeItem("b");
         store.setItem(alwaysAsString ? "undefined" : <string>undefined, "none-undef");
 
-        sr.deepEqual(store.getKeys(), ["c", "null", "a", "undefined"]);
+        asr.deepEqual(store.getKeys(), ["c", "null", "a", "undefined"]);
 
         store.removeItem("null");
         store.removeItem("undefined");
 
-        sr.deepEqual(store.getKeys(), ["c", "a"]);
+        asr.deepEqual(store.getKeys(), ["c", "a"]);
 
         store.clear();
     }

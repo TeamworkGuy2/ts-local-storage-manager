@@ -6,13 +6,10 @@ import MemoryStore = require("./MemoryStore");
  * @since 2016-3-24
  */
 class LocalStorageStore implements LocalStore {
-    private static defaultInst: LocalStorageStore;
-    private static sessionInst: LocalStorageStore;
-
     private MAX_ITEM_SIZE_BYTES = 1000000;
     private store: StorageLike & { getKeys?: () => string[]; };
     private getStoreKeys: (store: StorageLike) => string[];
-    private handleFullStore: FullStoreHandler;
+    private handleFullStore: LocalStore.FullStoreHandler;
     private trackTotalSize: boolean;
     private len: number;
     private totalDataSize: number;
@@ -30,7 +27,7 @@ class LocalStorageStore implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: LocalStore.FullStoreHandler,
             trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.getStoreKeys = getStoreKeys;
@@ -216,23 +213,20 @@ class LocalStorageStore implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: FullStoreHandler,
+    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: LocalStore.FullStoreHandler,
             trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
         return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     }
 
 
-    public static getDefaultInst(itemsRemovedCallback?: ItemsRemovedCallback) {
-        return LocalStorageStore.defaultInst || (LocalStorageStore.defaultInst = new LocalStorageStore(localStorage, null, (store, err) => {
+    /** Create a LocalStore object from a StorageLike object and an optional item removal callback
+     * @param store the store that will be used to store data
+     * @param [itemsRemovedCallback] an optional callback to call when items are removed from the store to free up space
+     */
+    public static newTimestampInst(store: StorageLike & { getKeys?: () => string[]; }, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback) {
+        return new LocalStorageStore(store, null, (store, err) => {
             LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
-        }, true, true, undefined, true));
-    }
-
-
-    public static getSessionInst(itemsRemovedCallback?: ItemsRemovedCallback) {
-        return LocalStorageStore.sessionInst || (LocalStorageStore.sessionInst = new LocalStorageStore(sessionStorage, null, (store, err) => {
-            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
-        }, true, true, undefined, true));
+        }, true, true, undefined, true);
     }
 
 }

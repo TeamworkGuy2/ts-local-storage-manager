@@ -21,7 +21,7 @@ class LocalStoreByCategory<M> {
         this.stores = <M>{};
         this.fullStoreHandlers = {};
 
-        var handleFullStore: FullStoreHandler = (store, err) => {
+        var handleFullStore: LocalStore.FullStoreHandler = (store, err) => {
             this.handleFullStores(store, err);
         };
 
@@ -75,15 +75,15 @@ module LocalStoreByCategory {
         store: UniqueStore;
         baseStore: LocalStore;
         clearFullStore: ClearFullStore;
-        handleFullStore?: FullStoreHandler;
-        handleFullStoreCallback?: FullStoreHandler;
-        categorizer?: KeyCategorizer;
+        handleFullStore?: LocalStore.FullStoreHandler;
+        handleFullStoreCallback?: LocalStore.FullStoreHandler;
+        categorizer?: LocalStore.KeyCategorizer;
     }
 
 
     interface EmptyBuilder {
         addStores<U>(stores: U): Builder<U>;
-        toStore(categorizer: KeyCategorizer, itemsRemovedCallback?: ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore;
+        toStore(categorizer: LocalStore.KeyCategorizer, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore;
     }
 
 
@@ -127,7 +127,7 @@ module LocalStoreByCategory {
         }
 
 
-        public toStore(categorizer: KeyCategorizer, itemsRemovedCallback?: ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore {
+        public toStore(categorizer: LocalStore.KeyCategorizer, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore {
             var clearFullStore = ClearFullStore.newInst((key) => Number.parseInt(categorizer.unmodifyKey(key)), itemsRemovedCallback, removePercentage);
 
             var res: CategoryStore = {

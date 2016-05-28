@@ -96,49 +96,91 @@ declare interface StorageLike {
 }
 
 
-declare interface KeyCategorizer {
-    category: string;
+declare module LocalStore {
 
-    /** Modify a key based on this categorizer's category so that it can recognize the key later (i.e. 'isMatchingCategory(modifyKey(key))' always returns true)
-     * @return the new key
-     */
-    modifyKey(key: string): string;
+    export interface KeyCategorizer {
+        category: string;
 
-    /** Given a modified key (i.e. the return value from 'modifyKey()') return the unmodified original key
-     * @param key the modified key
-     */
-    unmodifyKey(key: string): string;
+        /** Modify a key based on this categorizer's category so that it can recognize the key later (i.e. 'isMatchingCategory(modifyKey(key))' always returns true)
+         * @return the new key
+         */
+        modifyKey(key: string): string;
 
-    /** Check if a key matches this category
-     * @param key the key to check
-     */
-    isMatchingCategory(key: string): boolean;
-}
+        /** Given a modified key (i.e. the return value from 'modifyKey()') return the unmodified original key
+         * @param key the modified key
+         */
+        unmodifyKey(key: string): string;
 
-
-interface RemovedItem {
-    key: string;
-    value: any;
-    keyId: number;
-}
+        /** Check if a key matches this category
+         * @param key the key to check
+         */
+        isMatchingCategory(key: string): boolean;
+    }
 
 
-interface ItemsRemovedEvent {
-    store: LocalStore;
-    removedItems: RemovedItem[];
-    storageError: {
-        message: string;
-        error: any;
-    };
-    removedCount: number;
-}
+    export interface RemovedItem {
+        key: string;
+        value: any;
+        keyId: number;
+    }
 
 
-declare interface FullStoreHandler {
-    (storeI: LocalStore, err: any): void;
-}
+    export interface ItemsRemovedEvent {
+        store: LocalStore;
+        removedItems: RemovedItem[];
+        storageError: {
+            message: string;
+            error: any;
+        };
+        removedCount: number;
+    }
 
 
-declare interface ItemsRemovedCallback {
-    (store: LocalStore, removedItems: RemovedItem[], storageError: { message: string; error: any; }, removedCount: number): void;
+    export interface FullStoreHandler {
+        (storeI: LocalStore, err: any): void;
+    }
+
+
+    export interface ItemsRemovedCallback {
+        (store: LocalStore, removedItems: RemovedItem[], storageError: { message: string; error: any; }, removedCount: number): void;
+    }
+
+
+    export interface Array<T> {
+        key: string; // readonly
+
+        get(): T[];
+
+        getRaw(): string;
+
+        set(data: T[]): void;
+
+        remove(): void;
+    }
+
+
+    export interface Var<T> {
+        key: string; // readonly
+
+        get(): T;
+
+        getRaw(): string;
+
+        set(data: T): void;
+
+        remove(): void;
+    }
+
+
+    export class MapIndividualKeys<K, V> {
+
+        get(key: K): V;
+
+        getRaw(key: K): string;
+
+        set(key: K, data: V): void;
+
+        remove(key: K): void;
+    }
+
 }

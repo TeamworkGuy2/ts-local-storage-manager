@@ -183,15 +183,14 @@ var LocalStorageStore = (function () {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
         return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     };
-    LocalStorageStore.getDefaultInst = function (itemsRemovedCallback) {
-        return LocalStorageStore.defaultInst || (LocalStorageStore.defaultInst = new LocalStorageStore(localStorage, null, function (store, err) {
+    /** Create a LocalStore object from a StorageLike object and an optional item removal callback
+     * @param store the store that will be used to store data
+     * @param [itemsRemovedCallback] an optional callback to call when items are removed from the store to free up space
+     */
+    LocalStorageStore.newTimestampInst = function (store, itemsRemovedCallback) {
+        return new LocalStorageStore(store, null, function (store, err) {
             LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
-        }, true, true, undefined, true));
-    };
-    LocalStorageStore.getSessionInst = function (itemsRemovedCallback) {
-        return LocalStorageStore.sessionInst || (LocalStorageStore.sessionInst = new LocalStorageStore(sessionStorage, null, function (store, err) {
-            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
-        }, true, true, undefined, true));
+        }, true, true, undefined, true);
     };
     return LocalStorageStore;
 }());

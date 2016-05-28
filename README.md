@@ -18,7 +18,8 @@ LocalStoreByCategory - a class which contains a group of other LocalStores and a
 
 MemoryStore - provides a pure in-memory implementation of the interface exposed by 'localStorage' (i.e. lib.d.ts 'Storage'). 
 
-LocalStoreFromStorage and LocalStoreWrapper - provide additional validation ontop of existing 'StorageLike' or 'LocalStore' objects. 
+LocalStorageStore and LocalStoreWrapper - provide additional validation on top of existing 'StorageLike' or 'LocalStore' objects. 
 
+LocalStoreEntry - Wrappers for accessing a strongly typed LocalStore key-value without having to retype the key each time you access it
 
-See the /test directory for example usage of the functions in this project. 
+See the test/ directory for example usage of the functions in this project. 

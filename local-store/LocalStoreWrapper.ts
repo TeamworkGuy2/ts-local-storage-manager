@@ -8,7 +8,7 @@ import MemoryStore = require("./MemoryStore");
 class LocalStoreWrapper implements LocalStore {
     private MAX_ITEM_SIZE_BYTES = 1000000;
     private store: LocalStore;
-    private handleFullStore: FullStoreHandler;
+    private handleFullStore: LocalStore.FullStoreHandler;
     private trackTotalSize: boolean;
     private len: number;
     private totalDataSize: number;
@@ -25,7 +25,7 @@ class LocalStoreWrapper implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    constructor(store: LocalStore, handleFullStore: FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
+    constructor(store: LocalStore, handleFullStore: LocalStore.FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.handleFullStore = handleFullStore;
         this.MAX_ITEM_SIZE_BYTES = maxValueSizeBytes;
@@ -217,7 +217,7 @@ class LocalStoreWrapper implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    public static newInst(store: LocalStore, handleFullStore: FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean,
+    public static newInst(store: LocalStore, handleFullStore: LocalStore.FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean,
             maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
         return new LocalStoreWrapper(store, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     }

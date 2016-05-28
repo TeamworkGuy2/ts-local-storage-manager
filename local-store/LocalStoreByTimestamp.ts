@@ -9,11 +9,11 @@ import UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
  */
 class LocalStoreByTimestamp implements UniqueStore {
     private storeInst: LocalStore;
-    handleFullStore: FullStoreHandler;
+    handleFullStore: LocalStore.FullStoreHandler;
     keyGenerator: () => (string | number);
 
 
-    constructor(storeInst: LocalStore, keyGenerator: () => (string | number), handleFullStore: FullStoreHandler) {
+    constructor(storeInst: LocalStore, keyGenerator: () => (string | number), handleFullStore: LocalStore.FullStoreHandler) {
         this.storeInst = storeInst;
         this.handleFullStore = handleFullStore;
         this.keyGenerator = keyGenerator;
@@ -74,7 +74,7 @@ class LocalStoreByTimestamp implements UniqueStore {
     }
 
 
-    public static newInst(storeInst: LocalStore, keyGenerator: () => string, handleFullStore: FullStoreHandler) {
+    public static newInst(storeInst: LocalStore, keyGenerator: () => string, handleFullStore: LocalStore.FullStoreHandler) {
         return new LocalStoreByTimestamp(storeInst, keyGenerator, handleFullStore);
     }
 
@@ -84,7 +84,7 @@ class LocalStoreByTimestamp implements UniqueStore {
      * @param [logInfo] whether to log full store clearing events to the key-value store
      * @param [removeRatio] the percentage of items to remove from the store when it's full
      */
-    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
+    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
         var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
         return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, (storeInst, err) => {
             clearer.clearOldItems(storeInst, logInfo, err);

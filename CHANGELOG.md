@@ -4,7 +4,27 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.5.1](N/A) - 2016-05-03
+### [0.6.0](N/A) - 2016-05-28
+#### Added
+* LocalStoreEntry with Var, Array, and MapIndividualKeys classes for accessing strongly typed LocalStore key-values
+* LocalStorageStore.newTimestampInst();
+
+#### Changed
+* Moved the following local-store.d.ts interfaces into a new LocalStore module
+  * KeyCategorizer
+  * RemovedItem
+  * ItemsRemovedEvent
+  * FullStoreHandler
+  * ItemsRemovedCallback
+* Switched unit tests from qunit to chai and mocha
+* Moved test files out of test/local-store/ directory into root of test/ directory
+
+#### Removed
+* Removed LocalStorageStore getDefaultInst() and getSessionInst() in favor of newTimestampInst()
+
+
+--------
+### [0.5.1](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/13eb8e1fc4b2ace094e12eefac935a80c75bb954) - 2016-05-03
 #### Changed
 * ClearFullStore itemsRemovedCallback changed to not get called when 0 items are removed from a store
 * Improved some test cases
