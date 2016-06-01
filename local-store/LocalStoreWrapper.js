@@ -76,6 +76,9 @@ var LocalStoreWrapper = (function () {
         var store = this.store;
         return this.keys != null ? this.keys : (store.getKeys ? store.getKeys() : Object.keys(store));
     };
+    /** Get all of the values associated with the keys in this store
+     * @param plainString whether to return the raw string values or parse all of them
+     */
     LocalStoreWrapper.prototype.getData = function (plainString) {
         var store = this.store;
         var resData = [];
@@ -91,6 +94,8 @@ var LocalStoreWrapper = (function () {
         }
         return resData;
     };
+    /** Check whether a potential new key-value pair is valid or not
+     */
     LocalStoreWrapper.prototype.prepAndValidateValue = function (key, value, plainString) {
         if (!key) {
             throw new Error("cannot store item without an identifier key");
@@ -108,6 +113,9 @@ var LocalStoreWrapper = (function () {
         }
         return jsonString;
     };
+    /** Try to store the key-value pair in the underlying store and if an error occurs, run the full store handler and try inserting the value again,
+     * up to a certain number of attempts (default: 1)
+     */
     LocalStoreWrapper.prototype.trySetItem = function (key, value, retryAttempts) {
         if (retryAttempts === void 0) { retryAttempts = 1; }
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
@@ -141,7 +149,7 @@ var LocalStoreWrapper = (function () {
             }
         }
     };
-    LocalStoreWrapper.prototype.logItemAdded = function (key, value, existingValue) {
+    LocalStoreWrapper.prototype.logItemAdded = function (key, newValue, existingValue) {
         if (existingValue == null) {
             this.len++;
             this.modCount++;
@@ -153,7 +161,7 @@ var LocalStoreWrapper = (function () {
             }
         }
         if (this.trackTotalSize) {
-            this.totalDataSize += value.length;
+            this.totalDataSize += newValue.length;
         }
     };
     LocalStoreWrapper.prototype.logItemRemoved = function (key, existingValue) {
@@ -166,6 +174,10 @@ var LocalStoreWrapper = (function () {
             MemoryStore.removeAryItem(key, this.keys);
         }
     };
+    /** Load an existing StorageLike object and add all of its key-value pairs
+     * @param store the StorageLike object to load (with an optional getKeys() function)
+     * @param [keyFilter] optional filter to skip loading keys from the 'store'
+     */
     LocalStoreWrapper.prototype.loadDataFrom = function (store, keyFilter) {
         var keys = store.getKeys ? store.getKeys() : Object.keys(store);
         for (var i = 0, size = keys.length; i < size; i++) {

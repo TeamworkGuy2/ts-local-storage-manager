@@ -97,6 +97,9 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
+    /** Get all of the values associated with the keys in this store
+     * @param plainString whether to return the raw string values or parse all of them
+     */
     public getData(plainString?: boolean): any[] {
         var store = this.store;
         var resData: any[] = [];
@@ -114,6 +117,8 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
+    /** Check whether a potential new key-value pair is valid or not
+     */
     private prepAndValidateValue(key: string, value: any, plainString: boolean) {
         if (!key) { throw new Error("cannot store item without an identifier key"); }
 
@@ -133,6 +138,9 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
+    /** Try to store the key-value pair in the underlying store and if an error occurs, run the full store handler and try inserting the value again,
+     * up to a certain number of attempts (default: 1)
+     */
     private trySetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
@@ -168,7 +176,7 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
-    private logItemAdded(key: string, value: string, existingValue: string): void {
+    private logItemAdded(key: string, newValue: string, existingValue: string): void {
         if (existingValue == null) {
             this.len++;
             this.modCount++;
@@ -180,7 +188,7 @@ class LocalStoreWrapper implements LocalStore {
             }
         }
         if (this.trackTotalSize) {
-            this.totalDataSize += value.length;
+            this.totalDataSize += newValue.length;
         }
     }
 
@@ -197,6 +205,10 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
+    /** Load an existing StorageLike object and add all of its key-value pairs
+     * @param store the StorageLike object to load (with an optional getKeys() function)
+     * @param [keyFilter] optional filter to skip loading keys from the 'store'
+     */
     private loadDataFrom(store: StorageLike & { getKeys?: () => string[]; }, keyFilter?: (key: string) => boolean): void {
         var keys = store.getKeys ? store.getKeys() : Object.keys(store);
         for (var i = 0, size = keys.length; i < size; i++) {

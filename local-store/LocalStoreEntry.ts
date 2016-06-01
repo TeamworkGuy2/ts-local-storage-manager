@@ -6,6 +6,7 @@
         private defaultValue: T[];
 
         constructor(store: LocalStore, key: string, defaultValue?: T[]) {
+            this.store = store;
             this.key = key;
             this.defaultValue = defaultValue;
         }
@@ -36,6 +37,7 @@
         private plainStr: boolean;
 
         constructor(store: LocalStore, key: string, defaultValue?: T, alwaysRaw = false) {
+            this.store = store;
             this.key = key;
             this.defaultValue = defaultValue;
             this.plainStr = alwaysRaw;
@@ -65,6 +67,7 @@
         private keyGen: (key: K) => string;
 
         constructor(store: LocalStore, keyGen: (key: K) => string) {
+            this.store = store;
             this.keyGen = keyGen;
         }
 
@@ -90,13 +93,13 @@
     }
 
 
-    export function newArray<T>(store: LocalStore, key: string): LocalStoreEntry.Array<T> {
-        return new Array<T>(store, key);
+    export function newArray<T>(store: LocalStore, key: string, defaultValue?: T[]): LocalStoreEntry.Array<T> {
+        return new Array<T>(store, key, defaultValue);
     }
 
 
-    export function newVar<T>(store: LocalStore, key: string): LocalStoreEntry.Var<T> {
-        return new Var<T>(store, key);
+    export function newVar<T>(store: LocalStore, key: string, defaultValue?: T, alwaysRaw?: boolean): LocalStoreEntry.Var<T> {
+        return new Var<T>(store, key, defaultValue, alwaysRaw);
     }
 
 

@@ -3,6 +3,7 @@ var LocalStoreEntry;
 (function (LocalStoreEntry) {
     var Array = (function () {
         function Array(store, key, defaultValue) {
+            this.store = store;
             this.key = key;
             this.defaultValue = defaultValue;
         }
@@ -25,6 +26,7 @@ var LocalStoreEntry;
     var Var = (function () {
         function Var(store, key, defaultValue, alwaysRaw) {
             if (alwaysRaw === void 0) { alwaysRaw = false; }
+            this.store = store;
             this.key = key;
             this.defaultValue = defaultValue;
             this.plainStr = alwaysRaw;
@@ -47,6 +49,7 @@ var LocalStoreEntry;
     LocalStoreEntry.Var = Var;
     var MapIndividualKeys = (function () {
         function MapIndividualKeys(store, keyGen) {
+            this.store = store;
             this.keyGen = keyGen;
         }
         MapIndividualKeys.prototype.get = function (key) {
@@ -68,12 +71,12 @@ var LocalStoreEntry;
         return MapIndividualKeys;
     }());
     LocalStoreEntry.MapIndividualKeys = MapIndividualKeys;
-    function newArray(store, key) {
-        return new Array(store, key);
+    function newArray(store, key, defaultValue) {
+        return new Array(store, key, defaultValue);
     }
     LocalStoreEntry.newArray = newArray;
-    function newVar(store, key) {
-        return new Var(store, key);
+    function newVar(store, key, defaultValue, alwaysRaw) {
+        return new Var(store, key, defaultValue, alwaysRaw);
     }
     LocalStoreEntry.newVar = newVar;
     function newMapWithIndividualKeys(store, keyGen) {

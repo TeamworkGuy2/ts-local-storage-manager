@@ -139,7 +139,7 @@ module LocalStoreByCategory {
                 store: null,
             };
 
-            var fullStoreHandlerFunc = (storeInst, err) => res.handleFullStoreCallback(storeInst, err);
+            var fullStoreHandlerFunc: LocalStore.FullStoreHandler = (storeInst, err) => res.handleFullStoreCallback(storeInst, err);
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, (key) => categorizer.isMatchingCategory(key));
 
             res.handleFullStore = fullStoreHandlerFunc;

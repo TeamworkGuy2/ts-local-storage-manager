@@ -4,7 +4,17 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.0](N/A) - 2016-05-28
+### [0.6.1](N/A) - 2016-06-01
+#### Changed
+* Added missing data type and some documentation
+* Added some missing optional parameters to the static LocalStoreEntry constructor functions
+
+#### Fixed
+* LocalStoreEntry constructors weren't saving 'store' references
+
+
+--------
+### [0.6.0](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/5c8b4ef358c3bb0668ef015252e6c54d41d3b457) - 2016-05-28
 #### Added
 * LocalStoreEntry with Var, Array, and MapIndividualKeys classes for accessing strongly typed LocalStore key-values
 * LocalStorageStore.newTimestampInst();
