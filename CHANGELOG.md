@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.1](N/A) - 2016-06-01
+### [0.6.2](N/A) - 2016-06-27
+#### Fixed
+* LocalStorageStore getKeys() bug not returning new array each time it is called, was leaking underlying array that was modified by other LocalStorageStore actions
+
+
+--------
+### [0.6.1](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/dcfc7d008c7c5f9d1795d7ba76f8b9282fc70a6b) - 2016-06-01
 #### Changed
 * Added missing data type and some documentation
 * Added some missing optional parameters to the static LocalStoreEntry constructor functions

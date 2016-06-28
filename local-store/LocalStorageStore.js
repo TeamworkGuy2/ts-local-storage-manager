@@ -7,8 +7,9 @@ var MemoryStore = require("./MemoryStore");
  */
 var LocalStorageStore = (function () {
     /**
-     * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
-     * @param getStoreKeys a function that gets the keys from the 'store'
+     * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore.
+     * Note: the optional getKeys() function MUST return a new array each time it is called
+     * @param getStoreKeys a function that gets the keys from the 'store' (Note: this function function MUST return a new array each time it is called)
      * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
@@ -77,7 +78,7 @@ var LocalStorageStore = (function () {
     };
     LocalStorageStore.prototype.getKeys = function () {
         var store = this.store;
-        return this.keys != null ? this.keys : (store.getKeys ? store.getKeys() : (this.getStoreKeys ? this.getStoreKeys(store) : Object.keys(store)));
+        return this.keys != null ? this.keys.slice() : (store.getKeys ? store.getKeys() : (this.getStoreKeys ? this.getStoreKeys(store) : Object.keys(store)));
     };
     LocalStorageStore.prototype.getData = function (plainString) {
         var store = this.store;
@@ -171,8 +172,9 @@ var LocalStorageStore = (function () {
         }
     };
     /**
-     * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
-     * @param getStoreKeys a function that gets the keys from the 'store'
+     * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore.
+     * Note: the optional getKeys() function MUST return a new array each time it is called
+     * @param getStoreKeys a function that gets the keys from the 'store' (Note: this function MUST return a new array each time it is called)
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
@@ -184,7 +186,8 @@ var LocalStorageStore = (function () {
         return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
     };
     /** Create a LocalStore object from a StorageLike object and an optional item removal callback
-     * @param store the store that will be used to store data
+     * @param store the store that will be used to store data.
+     * Note: the optional getKeys() function MUST return a new array each time it is called
      * @param [itemsRemovedCallback] an optional callback to call when items are removed from the store to free up space
      */
     LocalStorageStore.newTimestampInst = function (store, itemsRemovedCallback) {

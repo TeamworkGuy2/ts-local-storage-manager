@@ -1,7 +1,6 @@
 /// <reference path="../../definitions/node/node.d.ts" />
-/// <reference path="../../definitions/node/node-modules-custom.d.ts" />
-/// <reference path="../../definitions/lib/chai.d.ts" />
-/// <reference path="../../definitions/lib/mocha.d.ts" />
+/// <reference path="../../definitions/chai/chai.d.ts" />
+/// <reference path="../../definitions/mocha/mocha.d.ts" />
 "use strict";
 var chai = require("chai");
 var MemoryStore = require("../local-store/MemoryStore");
@@ -99,6 +98,15 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         // add an item via the base
         baseStore.setItem("five", { value: "five" });
         asr.equal(wrapper1.getKeys().indexOf("five") < 0, baseStore.getKeys().indexOf("five") > -1);
+    });
+    test("local-store-get-keys-array-unique", function LocalStorageStoreGetKeys() {
+        var store = LocalStorageStore.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
+        var keys1 = store.getKeys();
+        keys1.push("test");
+        store.setItem("A", "alphabet");
+        var keys2 = store.getKeys();
+        asr.deepEqual(keys2, ["A"]);
+        asr.notDeepEqual(keys2, keys1);
     });
     function simpleStringHashCode(str) {
         return (str.length > 0 ? str.charCodeAt(0) << 16 : 0) +
