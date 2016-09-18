@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.2](N/A) - 2016-06-27
+### [0.6.3](N/A) - 2016-09-17
+#### Changed
+* Added some (by default) redudant type casts so this library can work with ts-date-times if the built in Date class/methods are setup to return TimestampUtc instead of number
+
+
+--------
+### [0.6.2](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/cdba6cc36c1a88e35336ef807130173203990401) - 2016-06-27
 #### Fixed
 * LocalStorageStore getKeys() bug not returning new array each time it is called, was leaking underlying array that was modified by other LocalStorageStore actions
 
