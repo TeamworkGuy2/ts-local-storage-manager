@@ -70,10 +70,10 @@ module CommonStorageTests {
     // copied from ts-mortar library
     /** Check whether two arrays are equal, ignoring the order of the elements in each array.
      * elements are compared using strict (i.e. '===') equality.
-     * For example: {@code looseEqual([26, "Alpha", 5], [5, 26, "Alpha"])}
-     * returns: {@code true}
-     * Or example: {@code looseEqual([34, "A", "QA"], [7, 34, "A"])}
-     * returns: {@code false}
+     * For example: looseEqual([26, "Alpha", 5], [5, 26, "Alpha"])
+     * returns: true
+     * Or example: looseEqual([34, "A", "QA"], [7, 34, "A"])
+     * returns: false
      *
      * @param ary1: the first array to compare
      * @param ary1: the second array to compare

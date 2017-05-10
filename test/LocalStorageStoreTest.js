@@ -1,7 +1,6 @@
-/// <reference path="../../definitions/node/node.d.ts" />
-/// <reference path="../../definitions/chai/chai.d.ts" />
-/// <reference path="../../definitions/mocha/mocha.d.ts" />
+/// <reference types="node" />
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var MemoryStore = require("../local-store/MemoryStore");
 var LocalStorageStore = require("../local-store/LocalStorageStore");

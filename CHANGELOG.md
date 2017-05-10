@@ -4,7 +4,14 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.3](N/A) - 2016-09-17
+### [0.6.4](N/A) - 2017-05-09
+#### Changed
+* Update to TypeScript 2.3, add tsconfig.json, use @types/ definitions
+* Update documentation for easier use with Visual Studio
+
+
+--------
+### [0.6.3](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/06c461007a4891df783dd9c3b9309dc7e3c0e607) - 2016-09-17
 #### Changed
 * Added some (by default) redudant type casts so this library can work with ts-date-times if the built in Date class/methods are setup to return TimestampUtc instead of number
 

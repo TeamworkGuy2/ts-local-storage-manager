@@ -48,14 +48,14 @@ class ClearFullStore {
     }
 
 
-    /** Given a {@link LocalStore} with integer based keys (not all keys must be integers),
-     * remove {@code removePercentage} percent of the smallest integer keys
+    /** Given a LocalStore with integer based keys (not all keys must be integers),
+     * remove 'removePercentage' percent of the smallest integer keys
      * @param removePercentage: a value in the range [0.0, 1.0] that specifies the percentage of timestamped values to remove
      * @param localStore: the local storage object to remove old timestamped items from
      * @param [minItemsRemoved=1]: the minimum number of items to remove
      * @param [maxItemsRemoved=(localStore keys where key is Integer).length]: the maximum number of items to remove,
-     * this defaults to the total number of integer based keys in {@code localStore}
-     * @return the number of items removed from the {@code localStore}
+     * this defaults to the total number of integer based keys in 'localStore'
+     * @return the number of items removed from the 'localStore'
      */
     private static removeOldItems(localStore: LocalStore, extractChronoId: (key: string) => number, removePercentage: number,
             minItemsRemoved: number = 1, maxItemsRemoved?: number): { items: LocalStore.RemovedItem[]; idsSorted: { id: number; key: string; }[], removedCount: number; } {

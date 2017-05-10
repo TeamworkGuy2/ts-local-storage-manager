@@ -51,7 +51,6 @@ var LocalStoreByCategory = (function () {
     };
     return LocalStoreByCategory;
 }());
-var LocalStoreByCategory;
 (function (LocalStoreByCategory) {
     var Builder = (function () {
         function Builder(storeInst, keyGenerator) {

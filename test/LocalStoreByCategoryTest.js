@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
 var LocalStoreByCategory = require("../local-store/LocalStoreByCategory");
 var UniqueChronologicalKeys = require("../local-store/UniqueChronologicalKeys");

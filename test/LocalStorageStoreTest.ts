@@ -1,6 +1,4 @@
-﻿/// <reference path="../../definitions/node/node.d.ts" />
-/// <reference path="../../definitions/chai/chai.d.ts" />
-/// <reference path="../../definitions/mocha/mocha.d.ts" />
+﻿/// <reference types="node" />
 "use strict";
 import chai = require("chai");
 import mocha = require("mocha");

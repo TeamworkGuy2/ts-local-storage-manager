@@ -22,7 +22,7 @@ declare interface ReadOnlyLocalStore {
     hasItem(key: string): boolean;
 
     /**
-     * @return {string[]} a set of all the keys this collection contains
+     * @return a set of all the keys this collection contains
      */
     getKeys(): string[];
 
@@ -55,16 +55,16 @@ declare interface LocalStore extends ReadOnlyLocalStore {
 declare interface UniqueStore extends ReadOnlyLocalStore {
 
     /** Add a new value to this collection
-     * @param {string} key: the key
-     * @param {any} value: the value to associate with the key
-     * @param {boolean} [plainString=false]: true to return the retrieved value as is, false to parse it before returning it
-     * @return {string} the newly generated unique key for {@code value}
+     * @param key: the key string
+     * @param value: the value to associate with the key
+     * @param [plainString=false]: true to return the retrieved value as is, false to parse it before returning it
+     * @return the newly generated unique key for 'value''
      */
     addItem(value: any, plainString?: boolean): string;
 
     /** Remove a key and it's associated value
-     * @param {string} key: the key to remove
-     * @return the value associated key that is now removed
+     * @param key: the key to remove
+     * @return the value associated with the key that is now removed
      */
     removeItem(key: string): void;
 
