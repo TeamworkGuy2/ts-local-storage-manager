@@ -82,7 +82,7 @@ module LocalStoreByCategory {
 
 
     interface EmptyBuilder {
-        addStores<U>(stores: U): Builder<U>;
+        addStores<U extends { [name: string]: UniqueStore }>(stores: U): Builder<U>;
         toStore(categorizer: LocalStore.KeyCategorizer, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, maxValueSizeBytes?: number, removePercentage?: number): UniqueStore;
     }
 

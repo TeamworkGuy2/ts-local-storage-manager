@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.4](N/A) - 2017-05-09
+### [0.6.5](N/A) - 2017-08-06
+#### Changed
+* Update to TypeScript 2.4
+
+
+--------
+### [0.6.4](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/292a1dc21f3e4328c9238c398f7bbe4a68793c36) - 2017-05-09
 #### Changed
 * Update to TypeScript 2.3, add tsconfig.json, use @types/ definitions
 * Update documentation for easier use with Visual Studio

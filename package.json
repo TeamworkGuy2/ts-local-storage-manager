@@ -1,6 +1,6 @@
 {
   "name": "ts-local-storage-manager",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "TypeScript wrappers and implementations for javascript 'Storage' (i.e. localStorage/sessionStorage) type objects",
   "author": "TeamworkGuy2",
   "license": "MIT",
@@ -10,9 +10,9 @@
     "@types/chai": "~3.5.0",
     "@types/mocha": "~2.2.0",
     "@types/node": "~7.0.0",
-    "chai": "~3.5.0",
-    "mocha": "~2.5.0",
-    "typescript": "~2.3.0"
+    "chai": "~4.1.0",
+    "mocha": "~3.5.0",
+    "typescript": "~2.4.0"
   },
   "scripts": {
     "test": "mocha -u tdd"
