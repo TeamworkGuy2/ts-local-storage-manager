@@ -17,17 +17,17 @@ Provide an easy to setup (5-10 loc) wrapper for 'localStorage' which can be used
 * callbacks to track when old items are removed due to local storage being full, useful for archiving old data
 
 
-### Major API Pieces:
-#### LocalStoreByCategory
+## API:
+### LocalStoreByCategory
 A class which contains a group of other LocalStores and allows you to treat 'localStorage' like a group of collections. 
 
-#### MemoryStore
+### MemoryStore
 Provides a pure in-memory implementation of the interface exposed by 'localStorage' (i.e. lib.d.ts 'Storage'). 
 
-#### LocalStorageStore and LocalStoreWrapper
+### LocalStorageStore and LocalStoreWrapper
 Provide additional validation on top of existing 'StorageLike' or 'LocalStore' objects. 
 
-#### LocalStoreEntry
+### LocalStoreEntry
 Wrappers for accessing a strongly typed LocalStore key-value without having to retype the key each time you access it
 
-See the test/ directory for example usage of the functions in this project. 
+See the `test/` directory for example usage of the functions in this project.

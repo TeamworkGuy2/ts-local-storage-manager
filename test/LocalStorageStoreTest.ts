@@ -15,7 +15,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
 
     test("local-store-from-storage-1", function LocalStorageStoreScenario1Test() {
         var memBaseStore = MemoryStore.newInst();
-        var store = LocalStorageStore.newInst(memBaseStore, null, null, true, true, 20, false);
+        var store = LocalStorageStore.newInst(memBaseStore, null, <LocalStore.FullStoreHandler><any>null, true, true, 20, false);
 
         asr.equal(store.getItem("a"), null);
 
@@ -57,7 +57,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         var removePercentage = 0.49;
         var memStore = MemoryStore.newInst(undefined, 3);
         var fullStoreHandler = ClearFullStore.newInst((key) => parseInt(key.substr(key.lastIndexOf('-') + 1)), (store, items, err, removedCount) => itemsRemovedFunc(store, items, err, removedCount), removePercentage);
-        var baseStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+        var baseStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
         // ---- test exceeding max items and removing 1 item ----
         // assuming removal-percentage-when-full is less than 50%
         baseStore.setItem("one-123", { value: "one" });
@@ -66,7 +66,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
 
         var store = LocalStoreWrapper.newInst(baseStore, (store, err) => fullStoreHandler.clearOldItems(store, true, err), true, true, undefined, true);
         // setup a local store full callback which sets the 'errorRef' variable
-        var errorRef: LocalStore.ItemsRemovedEvent = null;
+        var errorRef: LocalStore.ItemsRemovedEvent = <any>null;
         itemsRemovedFunc = (store, removedItems, storageError, removedCount) => {
             errorRef = { store, removedItems, storageError, removedCount };
         };
@@ -79,7 +79,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         checkStoreFullErrorData(errorRef, {
             "two-22": JSON.stringify({ value: "two" })
         });
-        errorRef = null;
+        errorRef = <any>null;
 
         // add another item, exceeding the 3 item limit again
         store.setItem("five-55", { value: "five" });
@@ -88,7 +88,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         checkStoreFullErrorData(errorRef, {
             "four-40": JSON.stringify({ value: "four" })
         });
-        errorRef = null;
+        errorRef = <any>null;
 
         // add two items, exceeding the 4 item limit
         asr.deepEqual(store.getKeys().sort(), ["five-55", "one-123", "three-300"]);
@@ -109,7 +109,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
 
     test("local-store-from-storage-load-existing", function LocalStorageStoreLoadExisting() {
         var fullStoreHandler = ClearFullStore.newInst((key) => (key.length > 0 ? key.charCodeAt(0) << 16 : 0) + (key.length > 1 ? key.charCodeAt(1) : 0));
-        var baseStore = LocalStorageStore.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
+        var baseStore = LocalStorageStore.newInst(MemoryStore.newInst(), null, <LocalStore.FullStoreHandler><any>null, true, false, 50, false);
         baseStore.setItem("one", { value: "one" });
         baseStore.setItem("two", { value: "two" });
         baseStore.setItem("three", { value: "three" });
@@ -129,7 +129,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
 
 
     test("local-store-get-keys-array-unique", function LocalStorageStoreGetKeys() {
-        var store = LocalStorageStore.newInst(MemoryStore.newInst(), null, null, true, false, 50, false);
+        var store = LocalStorageStore.newInst(MemoryStore.newInst(), null, <LocalStore.FullStoreHandler><any>null, true, false, 50, false);
         var keys1 = store.getKeys();
         keys1.push("test");
         store.setItem("A", "alphabet");

@@ -20,13 +20,14 @@ var ClearFullStore = (function () {
     ClearFullStore.prototype.clearOldItems = function (store, logInfo, err, removePercentage, minItemsRemoved, maxItemsRemoved) {
         if (removePercentage === void 0) { removePercentage = this.removePercentage; }
         if (minItemsRemoved === void 0) { minItemsRemoved = 1; }
+        var start = 0, end = 0;
         if (logInfo) {
-            var start = UniqueChronologicalKeys.getMillisecondTime();
+            start = UniqueChronologicalKeys.getMillisecondTime();
         }
         var removedItems = ClearFullStore.removeOldItems(store, this.extractChronoId, removePercentage, minItemsRemoved, maxItemsRemoved);
         this.removalAttemptsCount++;
         if (logInfo) {
-            var end = UniqueChronologicalKeys.getMillisecondTime();
+            end = UniqueChronologicalKeys.getMillisecondTime();
         }
         if (this.itemsRemovedCallback && removedItems.removedCount > 0) {
             this.itemsRemovedCallback(store, removedItems.items, {

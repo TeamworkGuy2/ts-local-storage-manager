@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.5](N/A) - 2017-08-06
+### [0.6.6](N/A) - 2017-11-17
+#### Changed
+* `tsconfig.json` added `strictNullChecks`, `noImplicitAny`, and `noImplicitThis` and setup code to handle null types.
+
+
+--------
+### [0.6.5](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/08eaa83bccf0e51fe2442d8aba4ae197a5224434) - 2017-08-06
 #### Changed
 * Update to TypeScript 2.4
 

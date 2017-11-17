@@ -7,7 +7,7 @@ import ClearFullStore = require("./ClearFullStore");
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
-class LocalStoreByCategory<M> {
+class LocalStoreByCategory<M extends object> {
     private timestampKeyGenerator: () => (string | number);
     public rootStore: LocalStore;
     public stores: M;
@@ -30,17 +30,16 @@ class LocalStoreByCategory<M> {
 
         for (var i = 0, size = keys.length; i < size; i++) {
             var key = keys[i];
-            var store: LocalStoreByCategory.CategoryStore = storeMap[key];
+            var store: LocalStoreByCategory.CategoryStore = (<any>storeMap)[key];
             store.handleFullStoreCallback = handleFullStore;
-            this.stores[key] = store.store;
+            (<any>this.stores)[key] = store.store;
             this.fullStoreHandlers[key] = store;
         }
     }
 
 
     public getStore(category: string) {
-        var store = this.stores[category];
-        return store;
+        return (<any>this.stores)[category];
     }
 
 
@@ -48,7 +47,7 @@ class LocalStoreByCategory<M> {
         var storesWithData: { [category: string]: UniqueStore } = {};
         var keys = Object.keys(this.stores);
         for (var i = 0, size = keys.length; i < size; i++) {
-            var categoryStore = this.stores[keys[i]];
+            var categoryStore = (<any>this.stores)[keys[i]];
             if (categoryStore.length > 0) {
                 storesWithData[keys[i]] = categoryStore;
             }
@@ -89,7 +88,7 @@ module LocalStoreByCategory {
 
 
 
-    export class Builder<T> implements EmptyBuilder {
+    export class Builder<T extends object> implements EmptyBuilder {
         private storeInst: LocalStore;
         private keyGenerator: () => (string | number);
         private stores: { [key: string]: CategoryStore };
@@ -131,15 +130,15 @@ module LocalStoreByCategory {
             var clearFullStore = ClearFullStore.newInst((key) => Number.parseInt(categorizer.unmodifyKey(key)), itemsRemovedCallback, removePercentage);
 
             var res: CategoryStore = {
-                baseStore: null,
+                baseStore: <LocalStore><never>null,
                 categorizer: categorizer,
                 clearFullStore: clearFullStore,
-                handleFullStore: null,
-                handleFullStoreCallback: null,
-                store: null,
+                handleFullStore: <undefined><any>null,
+                handleFullStoreCallback: <undefined><any>null,
+                store: <UniqueStore><never>null,
             };
 
-            var fullStoreHandlerFunc: LocalStore.FullStoreHandler = (storeInst, err) => res.handleFullStoreCallback(storeInst, err);
+            var fullStoreHandlerFunc: LocalStore.FullStoreHandler = (storeInst, err) => (<LocalStore.FullStoreHandler>res.handleFullStoreCallback)(storeInst, err); // get's set by LocalStoreByCategory constructor
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, (key) => categorizer.isMatchingCategory(key));
 
             res.handleFullStore = fullStoreHandlerFunc;
@@ -167,7 +166,7 @@ module LocalStoreByCategory {
             for (var i = index + 1; i < size; i++) {
                 ary[i - 1] = ary[i];
             }
-            ary[size - 1] = null;
+            ary[size - 1] = <never>null;
             ary.length = size - 1;
             return ary;
         }

@@ -8,7 +8,7 @@ class ClearFullStore {
     /** the function used to extract a chronological value from a stored key */
     private extractChronoId: (key: string) => number;
     /** optional function that is called when clearOldItems() is called with 'logInfo' parameter true */
-    private itemsRemovedCallback: LocalStore.ItemsRemovedCallback;
+    private itemsRemovedCallback: LocalStore.ItemsRemovedCallback | undefined;
     /** [0.0, 1.0] when the local store gets too full, remove this percentage of the entries */
     removePercentage: number = 0.3;
     /** an internal counter of how many times clearOldItems() has been called */
@@ -26,15 +26,16 @@ class ClearFullStore {
      */
     public clearOldItems(store: LocalStore, logInfo?: boolean, err?: any, removePercentage: number = this.removePercentage,
             minItemsRemoved: number = 1, maxItemsRemoved?: number): LocalStore.RemovedItem[] {
+        var start = 0, end = 0;
         if (logInfo) {
-            var start = UniqueChronologicalKeys.getMillisecondTime();
+            start = UniqueChronologicalKeys.getMillisecondTime();
         }
 
         var removedItems = ClearFullStore.removeOldItems(store, this.extractChronoId, removePercentage, minItemsRemoved, maxItemsRemoved);
         this.removalAttemptsCount++;
 
         if (logInfo) {
-            var end = UniqueChronologicalKeys.getMillisecondTime();
+            end = UniqueChronologicalKeys.getMillisecondTime();
         }
         if (this.itemsRemovedCallback && removedItems.removedCount > 0) {
             this.itemsRemovedCallback(store, removedItems.items, {

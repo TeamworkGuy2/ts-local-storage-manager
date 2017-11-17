@@ -109,8 +109,9 @@ var LocalStorageStore = (function () {
         if (retryAttempts === void 0) { retryAttempts = 1; }
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
+                var existingData = undefined;
                 if (this.keys != null) {
-                    var existingData = this.store.getItem(key);
+                    existingData = this.store.getItem(key);
                 }
                 // try setting the value (possibly multiple times)
                 this.store.setItem(key, value);

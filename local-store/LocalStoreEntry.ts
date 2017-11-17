@@ -8,7 +8,7 @@
         constructor(store: LocalStore, key: string, defaultValue?: T[]) {
             this.store = store;
             this.key = key;
-            this.defaultValue = defaultValue;
+            this.defaultValue = <T[]><any>defaultValue;
         }
 
         public get(): T[] {
@@ -39,7 +39,7 @@
         constructor(store: LocalStore, key: string, defaultValue?: T, alwaysRaw = false) {
             this.store = store;
             this.key = key;
-            this.defaultValue = defaultValue;
+            this.defaultValue = <T><any>defaultValue;
             this.plainStr = alwaysRaw;
         }
 

@@ -8,13 +8,13 @@ import MemoryStore = require("./MemoryStore");
 class LocalStorageStore implements LocalStore {
     private MAX_ITEM_SIZE_BYTES = 1000000;
     private store: StorageLike & { getKeys?: () => string[]; };
-    private getStoreKeys: (store: StorageLike) => string[];
+    private getStoreKeys: ((store: StorageLike) => string[]) | null | undefined;
     private handleFullStore: LocalStore.FullStoreHandler;
     private trackTotalSize: boolean;
     private len: number;
     private totalDataSize: number;
     private modCount: number;
-    private keys: string[];
+    private keys: string[] | null;
 
 
     /**
@@ -28,7 +28,7 @@ class LocalStorageStore implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: LocalStore.FullStoreHandler,
+    constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: ((store: StorageLike) => string[]) | null | undefined, handleFullStore: LocalStore.FullStoreHandler,
             trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.getStoreKeys = getStoreKeys;
@@ -112,7 +112,7 @@ class LocalStorageStore implements LocalStore {
     }
 
 
-    private prepAndValidateValue(key: string, value: any, plainString: boolean) {
+    private prepAndValidateValue(key: string, value: any, plainString: boolean | undefined) {
         if (!key) { throw new Error("cannot store item without an identifier key"); }
 
         if (plainString === true && typeof value !== "string") {
@@ -134,8 +134,9 @@ class LocalStorageStore implements LocalStore {
     private trySetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
+                var existingData: string = <never>undefined;
                 if (this.keys != null) {
-                    var existingData = <string>this.store.getItem(key);
+                    existingData = this.store.getItem(key);
                 }
 
                 // try setting the value (possibly multiple times)
@@ -165,11 +166,11 @@ class LocalStorageStore implements LocalStore {
     }
 
 
-    private logItemAdded(key: string, value: string, existingValue: string): void {
+    private logItemAdded(key: string, value: string, existingValue: string | null | undefined): void {
         if (existingValue == null) {
             this.len++;
             this.modCount++;
-            this.keys.push(key);
+            (<string[]>this.keys).push(key);
         }
         else {
             if (this.trackTotalSize) {
@@ -182,14 +183,14 @@ class LocalStorageStore implements LocalStore {
     }
 
 
-    private logItemRemoved(key: string, existingValue: string): void {
+    private logItemRemoved(key: string, existingValue: string | null | undefined): void {
         if (existingValue != null) {
             this.len--;
             if (this.trackTotalSize) {
                 this.totalDataSize -= existingValue.length;
             }
             this.modCount++;
-            MemoryStore.removeAryItem(key, this.keys);
+            MemoryStore.removeAryItem(key, <string[]>this.keys);
         }
     }
 
@@ -215,9 +216,9 @@ class LocalStorageStore implements LocalStore {
      * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
      * @param [keyFilter] an optional key filter used if 'loadExistingData'
      */
-    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: (store: StorageLike) => string[], handleFullStore: LocalStore.FullStoreHandler,
+    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: ((store: StorageLike) => string[]) | null | undefined, handleFullStore: LocalStore.FullStoreHandler,
             trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
-        return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter);
+        return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, <boolean>loadExistingData, keyFilter);
     }
 
 

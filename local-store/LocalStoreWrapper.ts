@@ -13,7 +13,7 @@ class LocalStoreWrapper implements LocalStore {
     private len: number;
     private totalDataSize: number;
     private modCount: number;
-    private keys: string[];
+    private keys: string[] | null;
 
 
     /**
@@ -119,7 +119,7 @@ class LocalStoreWrapper implements LocalStore {
 
     /** Check whether a potential new key-value pair is valid or not
      */
-    private prepAndValidateValue(key: string, value: any, plainString: boolean) {
+    private prepAndValidateValue(key: string, value: any, plainString: boolean | undefined) {
         if (!key) { throw new Error("cannot store item without an identifier key"); }
 
         if (plainString === true && typeof value !== "string") {
@@ -144,8 +144,9 @@ class LocalStoreWrapper implements LocalStore {
     private trySetItem(key: string, value: string, retryAttempts: number = 1): void {
         for (var attempt = 0; attempt <= retryAttempts; attempt++) {
             try {
+                var existingData: string = <never>undefined;
                 if (this.keys != null) {
-                    var existingData = <string>this.store.getItem(key, true);
+                    existingData = this.store.getItem(key, true);
                 }
 
                 // try setting the value (possibly multiple times)
@@ -176,11 +177,11 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
-    private logItemAdded(key: string, newValue: string, existingValue: string): void {
+    private logItemAdded(key: string, newValue: string, existingValue: string | null | undefined): void {
         if (existingValue == null) {
             this.len++;
             this.modCount++;
-            this.keys.push(key);
+            (<string[]>this.keys).push(key);
         }
         else {
             if (this.trackTotalSize) {
@@ -193,14 +194,14 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
-    private logItemRemoved(key: string, existingValue: string): void {
+    private logItemRemoved(key: string, existingValue: string | null | undefined): void {
         if (existingValue != null) {
             this.len--;
             if (this.trackTotalSize) {
                 this.totalDataSize -= existingValue.length;
             }
             this.modCount++;
-            MemoryStore.removeAryItem(key, this.keys);
+            MemoryStore.removeAryItem(key, <string[]>this.keys);
         }
     }
 

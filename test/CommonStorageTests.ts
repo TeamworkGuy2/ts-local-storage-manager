@@ -50,11 +50,11 @@ module CommonStorageTests {
     export function cornerCaseKeyNames(asr: Chai.AssertStatic, store: StorageLikeWithKeys, alwaysAsString: boolean) {
         store.setItem("c", "c-");
         store.setItem("b", "b-");
-        store.setItem(alwaysAsString ? "null" : <string>null, "none-null");
+        store.setItem(alwaysAsString ? "null" : <string><any>null, "none-null");
         store.setItem("a", "a-");
         store.setItem("b", "b-");
         store.removeItem("b");
-        store.setItem(alwaysAsString ? "undefined" : <string>undefined, "none-undef");
+        store.setItem(alwaysAsString ? "undefined" : <string><any>undefined, "none-undef");
 
         asr.deepEqual(store.getKeys(), ["c", "null", "a", "undefined"]);
 
@@ -96,7 +96,7 @@ module CommonStorageTests {
             return false;
         }
 
-        function compareFunc(val2) {
+        function compareFunc(this: T, val2: T) {
             return comparator(this, val2);
         }
 

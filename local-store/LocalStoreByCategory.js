@@ -27,8 +27,7 @@ var LocalStoreByCategory = (function () {
         }
     }
     LocalStoreByCategory.prototype.getStore = function (category) {
-        var store = this.stores[category];
-        return store;
+        return this.stores[category];
     };
     LocalStoreByCategory.prototype.getStoresContainingData = function () {
         var storesWithData = {};
@@ -87,7 +86,7 @@ var LocalStoreByCategory = (function () {
                 handleFullStoreCallback: null,
                 store: null,
             };
-            var fullStoreHandlerFunc = function (storeInst, err) { return res.handleFullStoreCallback(storeInst, err); };
+            var fullStoreHandlerFunc = function (storeInst, err) { return res.handleFullStoreCallback(storeInst, err); }; // get's set by LocalStoreByCategory constructor
             var storeWrapper = LocalStoreWrapper.newInst(this.storeInst, fullStoreHandlerFunc, true, true, maxValueSizeBytes, true, function (key) { return categorizer.isMatchingCategory(key); });
             res.handleFullStore = fullStoreHandlerFunc;
             //res.handleFullStoreCallback = null;

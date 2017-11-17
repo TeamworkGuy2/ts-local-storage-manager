@@ -24,7 +24,7 @@ interface CategoryEvent {
 suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
 
     var memStore = MemoryStore.newInst();
-    var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+    var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
     var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
     var store = storeBldr.addStores({
         alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),
@@ -105,7 +105,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
         var cI = 0;
         var dI = 0;
         var memStore = MemoryStore.newInst(10);
-        var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+        var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
         var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
         var store = storeBldr.addStores({
             charlie: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("c-"), (storeInst, removedItems, err, removedCount) => cI++),
@@ -143,7 +143,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
 
     /** Check that the TestStore contains the expected stores with expected sizes and data
      */
-    function assertDataStores(as: Chai.AssertStatic, store: LocalStoreByCategory<any>, plainStr: boolean, compare: (val1, val2) => boolean, expectedSubStores: { name: string; size: number; data: any[] }[]) {
+    function assertDataStores(as: Chai.AssertStatic, store: LocalStoreByCategory<any>, plainStr: boolean, compare: (val1: any, val2: any) => boolean, expectedSubStores: { name: string; size: number; data: any[] }[]) {
         var stores = store.getStoresContainingData();
         var names: string[] = [];
 

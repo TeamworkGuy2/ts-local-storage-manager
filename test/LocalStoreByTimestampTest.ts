@@ -15,7 +15,7 @@ suite("LocalStoreByTimestamp", function LocalStoreByTimestampTest() {
 
     test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test() {
         var memStore = MemoryStore.newInst();
-        var localStore = LocalStorageStore.newInst(memStore, null, null, false, false, 20);
+        var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, false, false, 20);
         var store = LocalStoreByTimestamp.newTimestampInst(localStore);
         store.keyGenerator = UniqueChronologicalKeys.uniqueTimestampNodeJs;
 

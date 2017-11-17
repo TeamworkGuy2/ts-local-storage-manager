@@ -6,9 +6,9 @@ declare interface ReadOnlyLocalStore {
     length: number;
 
     /** Get the value associated with a key
-     * @param {string} key: the name of the value to retrieve
-     * @param {boolean} [plainString=false]: true to return the retrieved value as is, false to parse it before returning it
-     * @param {any} the value associated with the key, or null if the key does not exist
+     * @param key the name of the value to retrieve
+     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
+     * @param the value associated with the key, or null if the key does not exist
      */
     getItem(key: string, plainString?: boolean): any;
 
@@ -16,7 +16,7 @@ declare interface ReadOnlyLocalStore {
     key(index: number): string;
 
     /**
-     * @param {string} key: the key to lookup
+     * @param key the key to lookup
      * @return true if the item exist, false if not
      */
     hasItem(key: string): boolean;
@@ -35,14 +35,14 @@ declare interface ReadOnlyLocalStore {
 declare interface LocalStore extends ReadOnlyLocalStore {
 
     /** Associate a value with a specific key
-     * @param {string} key: the key
-     * @param {any} value: the value to associate with the key
-     * @param {boolean} [plainString=false]: true to return the retrieved value as is, false to parse it before returning it
+     * @param key the key
+     * @param value the value to associate with the key
+     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
      */
     setItem(key: string, value: any, plainString?: boolean): void;
 
     /** Remove a key and it's associated value
-     * @param {string} key: the key to remove
+     * @param key the key to remove
      * @return the value associated key that is now removed
      */
     removeItem(key: string): void;
@@ -55,15 +55,15 @@ declare interface LocalStore extends ReadOnlyLocalStore {
 declare interface UniqueStore extends ReadOnlyLocalStore {
 
     /** Add a new value to this collection
-     * @param key: the key string
-     * @param value: the value to associate with the key
-     * @param [plainString=false]: true to return the retrieved value as is, false to parse it before returning it
+     * @param key the key string
+     * @param value the value to associate with the key
+     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
      * @return the newly generated unique key for 'value''
      */
     addItem(value: any, plainString?: boolean): string;
 
     /** Remove a key and it's associated value
-     * @param key: the key to remove
+     * @param key the key to remove
      * @return the value associated with the key that is now removed
      */
     removeItem(key: string): void;
@@ -85,7 +85,7 @@ declare interface StorageLike {
     /** Get an item by key */
     getItem(key: string): any;
 
-    /** Returns the n-th element in the store (in the order the items were added) */
+    /** Returns the N-th element in the store (in the order the items were added) */
     key(index: number): string;
 
     /** Remove an item by key */
