@@ -4,7 +4,7 @@ var UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
  * @author TeamworkGuy2
  * @since 2016-3-25
  */
-var ClearFullStore = (function () {
+var ClearFullStore = /** @class */ (function () {
     function ClearFullStore(extractChronoId, itemsRemovedCallback, removePercentage) {
         if (removePercentage === void 0) { removePercentage = 0.3; }
         /** [0.0, 1.0] when the local store gets too full, remove this percentage of the entries */

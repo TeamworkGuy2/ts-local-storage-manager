@@ -3,7 +3,7 @@
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
-var MemoryStore = (function () {
+var MemoryStore = /** @class */ (function () {
     /**
      * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
      * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown

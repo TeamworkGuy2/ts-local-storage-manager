@@ -6,7 +6,7 @@ var ClearFullStore = require("./ClearFullStore");
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
-var LocalStoreByCategory = (function () {
+var LocalStoreByCategory = /** @class */ (function () {
     function LocalStoreByCategory(rootStore, timestampKeyGenerator, storeMap) {
         var _this = this;
         this.rootStore = rootStore;
@@ -51,7 +51,7 @@ var LocalStoreByCategory = (function () {
     return LocalStoreByCategory;
 }());
 (function (LocalStoreByCategory) {
-    var Builder = (function () {
+    var Builder = /** @class */ (function () {
         function Builder(storeInst, keyGenerator) {
             this.storeInst = storeInst;
             this.keyGenerator = keyGenerator;

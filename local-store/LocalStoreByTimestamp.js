@@ -7,7 +7,7 @@ var UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
  * @author TeamworkGuy2
  * @since 2016-3-25
  */
-var LocalStoreByTimestamp = (function () {
+var LocalStoreByTimestamp = /** @class */ (function () {
     function LocalStoreByTimestamp(storeInst, keyGenerator, handleFullStore) {
         this.storeInst = storeInst;
         this.handleFullStore = handleFullStore;

@@ -31,7 +31,7 @@ var BasicCategorizers;
     BasicCategorizers.newSuffixCategorizer = newSuffixCategorizer;
     /** Default categorizer implementation
      */
-    var DefaultCategorizer = (function () {
+    var DefaultCategorizer = /** @class */ (function () {
         /**
          * @param checkFunc a function which given a store item's key, returns true if the key matches this category, false if not
          */

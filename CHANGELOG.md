@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.6](N/A) - 2017-11-17
+### [0.6.7](N/A) - 2018-03-01
+#### Changed
+* Update to TypeScript 2.7
+* Update dependencies: mocha, @types/chai, @types/mocha, @types/node
+* Enable tsconfig.json `noImplicitAny`
+
+
+--------
+### [0.6.6](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/fa3b1c98bf02c50e9cf1aef3d75dee6dc25d035e) - 2017-11-17
 #### Changed
 * `tsconfig.json` added `strictNullChecks`, `noImplicitAny`, and `noImplicitThis` and setup code to handle null types.
 

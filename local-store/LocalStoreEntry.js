@@ -1,7 +1,7 @@
 "use strict";
 var LocalStoreEntry;
 (function (LocalStoreEntry) {
-    var Array = (function () {
+    var Array = /** @class */ (function () {
         function Array(store, key, defaultValue) {
             this.store = store;
             this.key = key;
@@ -23,7 +23,7 @@ var LocalStoreEntry;
         return Array;
     }());
     LocalStoreEntry.Array = Array;
-    var Var = (function () {
+    var Var = /** @class */ (function () {
         function Var(store, key, defaultValue, alwaysRaw) {
             if (alwaysRaw === void 0) { alwaysRaw = false; }
             this.store = store;
@@ -47,7 +47,7 @@ var LocalStoreEntry;
         return Var;
     }());
     LocalStoreEntry.Var = Var;
-    var MapIndividualKeys = (function () {
+    var MapIndividualKeys = /** @class */ (function () {
         function MapIndividualKeys(store, keyGen) {
             this.store = store;
             this.keyGen = keyGen;

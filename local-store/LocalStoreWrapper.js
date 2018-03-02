@@ -4,7 +4,7 @@ var MemoryStore = require("./MemoryStore");
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
-var LocalStoreWrapper = (function () {
+var LocalStoreWrapper = /** @class */ (function () {
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore
      * @param handleFullStore the handler to call when 'store' fails to store an item

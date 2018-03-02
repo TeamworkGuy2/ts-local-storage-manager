@@ -5,7 +5,7 @@ var MemoryStore = require("./MemoryStore");
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
-var LocalStorageStore = (function () {
+var LocalStorageStore = /** @class */ (function () {
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore.
      * Note: the optional getKeys() function MUST return a new array each time it is called
