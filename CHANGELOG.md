@@ -4,11 +4,17 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.7](N/A) - 2018-03-01
+### [0.6.8](N/A) - 2018-04-02
+#### Changed
+* Update to TypeScript 2.8
+* Update tsconfig.json with `noImplicitReturns: true` and `forceConsistentCasingInFileNames: true`
+
+
+--------
+### [0.6.7](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/a359f60af8aba85eca682b0ffb54364a45cdc3c6) - 2018-03-01
 #### Changed
 * Update to TypeScript 2.7
 * Update dependencies: mocha, @types/chai, @types/mocha, @types/node
-* Enable tsconfig.json `noImplicitAny`
 
 
 --------
