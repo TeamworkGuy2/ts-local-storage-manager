@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.8](N/A) - 2018-04-02
+### [0.6.9](N/A) - 2018-04-09
+#### Changed
+* Added release tarball and npm script `build-package` to package.json referencing external process to generate tarball
+
+
+--------
+### [0.6.8](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/42075bd69b19ac5c727e4d7bf54d66f93ee0aba4) - 2018-04-02
 #### Changed
 * Update to TypeScript 2.8
 * Update tsconfig.json with `noImplicitReturns: true` and `forceConsistentCasingInFileNames: true`
