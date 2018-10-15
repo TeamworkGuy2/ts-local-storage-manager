@@ -9,7 +9,7 @@ class MemoryStore implements StorageLike {
     private keys: string[];
     private data: { [key: string]: string };
     /** returns true if adding the 'value' is valid, false if not, 'existingValue' is the existing value mapped to 'key', undefined if there is no existing value */
-    private validateBeforeSet: (key: string, value: string, existingValue: string) => boolean;
+    private validateBeforeSet: ((key: string, value: string, existingValue: string) => boolean) | null;
 
 
     /**
@@ -17,7 +17,14 @@ class MemoryStore implements StorageLike {
      * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     constructor(maxDataSize?: number, maxItems?: number) {
-        this.clear();
+        // copied from clear() to appease TS compiler
+        this.data = {};
+        this.keys = [];
+        this.len = 0;
+        this.totalDataSize = 0;
+        this.modCount = 0;
+
+        this.validateBeforeSet = null;
         this.setValidation(maxDataSize, maxItems);
     }
 

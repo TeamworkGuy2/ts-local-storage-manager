@@ -30,8 +30,9 @@ class LocalStoreWrapper implements LocalStore {
         this.handleFullStore = handleFullStore;
         this.MAX_ITEM_SIZE_BYTES = maxValueSizeBytes;
         this.trackTotalSize = trackTotalSize;
-        this.len = 0;
         this.keys = trackKeysAndLen ? [] : null;
+        this.len = 0;
+        this.totalDataSize = 0;
         this.modCount = 0;
 
         if (loadExistingData) {

@@ -4,7 +4,16 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.9](N/A) - 2018-04-09
+### [0.6.10](N/A) - 2018-10-14
+#### Changed
+* Update to TypeScript 3.1
+* Update dev dependencies and @types
+* Enable `tsconfig.json` `strict` and fix compile errors
+* Removed compiled bin tarball in favor of git tags and github releases
+
+
+--------
+### [0.6.9](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/8802da52285b7438979376ea8c10c9d0288d640b) - 2018-04-09
 #### Changed
 * Added release tarball and npm script `build-package` to package.json referencing external process to generate tarball
 

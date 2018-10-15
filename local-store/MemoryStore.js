@@ -9,7 +9,13 @@ var MemoryStore = /** @class */ (function () {
      * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     function MemoryStore(maxDataSize, maxItems) {
-        this.clear();
+        // copied from clear() to appease TS compiler
+        this.data = {};
+        this.keys = [];
+        this.len = 0;
+        this.totalDataSize = 0;
+        this.modCount = 0;
+        this.validateBeforeSet = null;
         this.setValidation(maxDataSize, maxItems);
     }
     /**
