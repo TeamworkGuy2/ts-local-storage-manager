@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.10](N/A) - 2018-10-14
+### [0.6.11](N/A) - 2018-12-29
+#### Changed
+* Update to TypeScript 3.2
+* Update @types dependencies
+* Remove `tsconfig.json lib "dom"` option since we're only using `window.performance` in `UniqueChronologicalKeys`
+
+
+--------
+### [0.6.10](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/20f4dbdef436ba86be0d6edd6edc371500f8bb88) - 2018-10-14
 #### Changed
 * Update to TypeScript 3.1
 * Update dev dependencies and @types
