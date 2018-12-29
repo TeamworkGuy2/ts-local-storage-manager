@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.11](N/A) - 2018-12-29
+### [0.6.12](N/A) - 2018-12-29
+#### Changed
+* Adjusted `LocalStoreByTimestamp.newTimestampInst()` to use uniqueTimestamp in the browser and uniqueTimestampNodeJs in Node.js
+
+
+--------
+### [0.6.11](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/3f0bd118363ef55fcb616e61c5520e7d0717834b) - 2018-12-29
 #### Changed
 * Update to TypeScript 3.2
 * Update @types dependencies

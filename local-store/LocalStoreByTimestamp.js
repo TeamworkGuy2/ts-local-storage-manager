@@ -59,12 +59,12 @@ var LocalStoreByTimestamp = /** @class */ (function () {
     };
     /** Creates a local store instance that uses 'UniqueTimestamp' for unique keys and 'ClearFullStore' for cleaning out full stores
      * @param localStore the key-value store to use
-     * @param [logInfo] whether to log full store clearing events to the key-value store
-     * @param [removeRatio] the percentage of items to remove from the store when it's full
+     * @param logInfo optional flag to log store clearing events to the key-value store
+     * @param removeRatio optional percentage of items to remove from the store when it's full
      */
     LocalStoreByTimestamp.newTimestampInst = function (localStore, itemsRemovedCallback, logInfo, removePercentage) {
         var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
-        return new LocalStoreByTimestamp(localStore, UniqueChronologicalKeys.uniqueTimestamp, function (storeInst, err) {
+        return new LocalStoreByTimestamp(localStore, typeof window !== "undefined" ? UniqueChronologicalKeys.uniqueTimestamp : UniqueChronologicalKeys.uniqueTimestampNodeJs, function (storeInst, err) {
             clearer.clearOldItems(storeInst, logInfo, err);
         });
     };
