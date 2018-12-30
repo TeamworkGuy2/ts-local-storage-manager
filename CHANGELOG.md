@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.12](N/A) - 2018-12-29
+### [0.6.13](N/A) - 2018-12-29
+#### Changed
+* Renamed `GLOBAL` -> `global` (Node.js has deprecated `GLOBAL`)
+
+
+--------
+### [0.6.12](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/cb725db332d488c2271686e2a6444329174acff6) - 2018-12-29
 #### Changed
 * Adjusted `LocalStoreByTimestamp.newTimestampInst()` to use uniqueTimestamp in the browser and uniqueTimestampNodeJs in Node.js
 

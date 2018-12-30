@@ -1,5 +1,5 @@
 ﻿
-declare var GLOBAL: { process: { hrtime(time?: number[]): [number, number]; } };
+declare var global: { process: { hrtime(time?: number[]): [number, number]; } };
 declare var window: { performance: { now(): number; } };
 
 /** Functions for creating relatively unique, chronological keys
@@ -16,7 +16,7 @@ module UniqueChronologicalKey {
 
     export function uniqueTimestampNodeJs(): number {
         // work around for the granularity of Date.now() and the rollover issue with performance.now()
-        return Math.round((<number>Date.now() + GLOBAL.process.hrtime()[1]/*nanoseconds*/) / 2 * 1000);
+        return Math.round((<number>Date.now() + global.process.hrtime()[1]/*nanoseconds*/) / 2 * 1000);
     }
 
 
@@ -26,7 +26,7 @@ module UniqueChronologicalKey {
     export var getMillisecondTime = ((typeof window !== "undefined" && window && window.performance) ? () => {
         return window.performance.now();
     } : () => {
-        return Math.floor(GLOBAL.process.hrtime()[1] / 1000); /*because hrtime()[1] is nanoseconds*/
+        return Math.floor(global.process.hrtime()[1] / 1000); /*because hrtime()[1] is nanoseconds*/
     });
 
 }
