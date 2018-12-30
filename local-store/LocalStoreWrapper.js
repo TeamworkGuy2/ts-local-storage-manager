@@ -11,8 +11,8 @@ var LocalStoreWrapper = /** @class */ (function () {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     function LocalStoreWrapper(store, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
@@ -178,7 +178,7 @@ var LocalStoreWrapper = /** @class */ (function () {
     };
     /** Load an existing StorageLike object and add all of its key-value pairs
      * @param store the StorageLike object to load (with an optional getKeys() function)
-     * @param [keyFilter] optional filter to skip loading keys from the 'store'
+     * @param keyFilter optional filter to skip loading keys from the 'store'
      */
     LocalStoreWrapper.prototype.loadDataFrom = function (store, keyFilter) {
         var keys = store.getKeys ? store.getKeys() : Object.keys(store);
@@ -195,8 +195,8 @@ var LocalStoreWrapper = /** @class */ (function () {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     LocalStoreWrapper.newInst = function (store, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }

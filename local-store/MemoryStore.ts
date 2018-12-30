@@ -13,8 +13,8 @@ class MemoryStore implements StorageLike {
 
 
     /**
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     constructor(maxDataSize?: number, maxItems?: number) {
         // copied from clear() to appease TS compiler
@@ -30,8 +30,8 @@ class MemoryStore implements StorageLike {
 
 
     /**
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     public setValidation(maxDataSize?: number, maxItems?: number) {
         if (maxDataSize != null || maxItems != null) {
@@ -157,8 +157,8 @@ class MemoryStore implements StorageLike {
 
 
     /** Create a memory store with optional limits on the stored data
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     public static newInst(maxDataSize?: number, maxItems?: number) {
         return new MemoryStore(maxDataSize, maxItems);

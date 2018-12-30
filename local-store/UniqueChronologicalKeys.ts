@@ -1,5 +1,4 @@
-﻿
-declare var global: { process: { hrtime(time?: number[]): [number, number]; } };
+﻿declare var global: { process: { hrtime(time?: number[]): [number, number]; } };
 declare var window: { performance: { now(): number; } };
 
 /** Functions for creating relatively unique, chronological keys

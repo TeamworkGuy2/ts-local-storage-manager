@@ -4,7 +4,14 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.13](N/A) - 2018-12-29
+### [0.6.14](N/A) - 2018-12-29
+#### Changed
+* Cleanup documentation
+* Cleanup `LocalStorageStore.newTimestampInst()`
+
+
+--------
+### [0.6.13](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/ee609588c403c7ee2acdb5229221b90f650b0560) - 2018-12-29
 #### Changed
 * Renamed `GLOBAL` -> `global` (Node.js has deprecated `GLOBAL`)
 

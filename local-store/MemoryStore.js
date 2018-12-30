@@ -5,8 +5,8 @@
  */
 var MemoryStore = /** @class */ (function () {
     /**
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     function MemoryStore(maxDataSize, maxItems) {
         // copied from clear() to appease TS compiler
@@ -19,8 +19,8 @@ var MemoryStore = /** @class */ (function () {
         this.setValidation(maxDataSize, maxItems);
     }
     /**
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     MemoryStore.prototype.setValidation = function (maxDataSize, maxItems) {
         var _this = this;
@@ -123,8 +123,8 @@ var MemoryStore = /** @class */ (function () {
         }
     };
     /** Create a memory store with optional limits on the stored data
-     * @param [maxDataSize] optional, inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
-     * @param [maxItems] optional, inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxDataSize optional inclusive limit on the total size (sum of string lengths) of all the data stored in this store, if this value is exceeded when calling setItem() an error is thrown
+     * @param maxItems optional inclusive limit on the total number of items stored in this store, if this value is exceeded when calling setItem() an error is thrown
      */
     MemoryStore.newInst = function (maxDataSize, maxItems) {
         return new MemoryStore(maxDataSize, maxItems);

@@ -1,14 +1,13 @@
 ﻿/** TypeScript interfaces for 'localStorage' wrappers
  */
-
 declare interface ReadOnlyLocalStore {
     /** the number of key-value pairs in this store */
     length: number;
 
     /** Get the value associated with a key
      * @param key the name of the value to retrieve
-     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
-     * @param the value associated with the key, or null if the key does not exist
+     * @param plainString optional flag (default=false), true to return the retrieved value as is, false to parse it before returning it
+     * @return the value associated with the key, or null if the key does not exist
      */
     getItem(key: string, plainString?: boolean): any;
 
@@ -37,7 +36,7 @@ declare interface LocalStore extends ReadOnlyLocalStore {
     /** Associate a value with a specific key
      * @param key the key
      * @param value the value to associate with the key
-     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
+     * @param plainString optional flag (default=false), true to return the retrieved value as is, false to parse it before returning it
      */
     setItem(key: string, value: any, plainString?: boolean): void;
 
@@ -57,7 +56,7 @@ declare interface UniqueStore extends ReadOnlyLocalStore {
     /** Add a new value to this collection
      * @param key the key string
      * @param value the value to associate with the key
-     * @param [plainString=false] true to return the retrieved value as is, false to parse it before returning it
+     * @param plainString optional flag (default=false), true to return the retrieved value as is, false to parse it before returning it
      * @return the newly generated unique key for 'value''
      */
     addItem(value: any, plainString?: boolean): string;

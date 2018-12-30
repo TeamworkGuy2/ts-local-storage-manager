@@ -22,8 +22,8 @@ class LocalStoreWrapper implements LocalStore {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     constructor(store: LocalStore, handleFullStore: LocalStore.FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
@@ -209,7 +209,7 @@ class LocalStoreWrapper implements LocalStore {
 
     /** Load an existing StorageLike object and add all of its key-value pairs
      * @param store the StorageLike object to load (with an optional getKeys() function)
-     * @param [keyFilter] optional filter to skip loading keys from the 'store'
+     * @param keyFilter optional filter to skip loading keys from the 'store'
      */
     private loadDataFrom(store: StorageLike & { getKeys?: () => string[]; }, keyFilter?: (key: string) => boolean): void {
         var keys = store.getKeys ? store.getKeys() : Object.keys(store);
@@ -228,8 +228,8 @@ class LocalStoreWrapper implements LocalStore {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     public static newInst(store: LocalStore, handleFullStore: LocalStore.FullStoreHandler, trackKeysAndLen: boolean, trackTotalSize: boolean,
             maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {

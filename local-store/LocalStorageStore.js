@@ -1,5 +1,5 @@
 "use strict";
-var LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
+var ClearFullStore = require("./ClearFullStore");
 var MemoryStore = require("./MemoryStore");
 /** LocalStore implementation wrapper for StorageLike objects
  * @author TeamworkGuy2
@@ -14,8 +14,8 @@ var LocalStorageStore = /** @class */ (function () {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     function LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
@@ -180,8 +180,8 @@ var LocalStorageStore = /** @class */ (function () {
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
      * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param [loadExistingData] true to filter the keys from the 'store' and load those which match the 'keyFilter'
-     * @param [keyFilter] an optional key filter used if 'loadExistingData'
+     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
+     * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     LocalStorageStore.newInst = function (store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, loadExistingData, keyFilter) {
         if (maxValueSizeBytes === void 0) { maxValueSizeBytes = 1000000; }
@@ -190,11 +190,14 @@ var LocalStorageStore = /** @class */ (function () {
     /** Create a LocalStore object from a StorageLike object and an optional item removal callback
      * @param store the store that will be used to store data.
      * Note: the optional getKeys() function MUST return a new array each time it is called
-     * @param [itemsRemovedCallback] an optional callback to call when items are removed from the store to free up space
+     * @param itemsRemovedCallback optional callback to call when items are removed from the store to free up space
+     * @param logInfo optional flag to log store clearing events to the key-value store
+     * @param removeRatio optional percentage of items to remove from the store when it's full
      */
-    LocalStorageStore.newTimestampInst = function (store, itemsRemovedCallback) {
+    LocalStorageStore.newTimestampInst = function (store, itemsRemovedCallback, logInfo, removePercentage) {
+        var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
         return new LocalStorageStore(store, null, function (store, err) {
-            LocalStoreByTimestamp.newTimestampInst(store, itemsRemovedCallback).handleFullStore(store, err);
+            clearer.clearOldItems(store, logInfo, err);
         }, true, true, undefined, true);
     };
     return LocalStorageStore;
