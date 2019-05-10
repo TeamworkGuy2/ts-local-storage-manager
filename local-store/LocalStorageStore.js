@@ -98,10 +98,8 @@ var LocalStorageStore = /** @class */ (function () {
         }
         var jsonString = plainString === true ? value : JSON.stringify(value);
         if (jsonString.length > this.MAX_ITEM_SIZE_BYTES) {
-            var errMsg = "attempting to save a local store value large than the specified limit of " + this.MAX_ITEM_SIZE_BYTES + ", key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
-            if (console && typeof console.error === "function") {
-                console.error(errMsg);
-            }
+            var errMsg = "attempting to save a local store value large than the specified limit of " + this.MAX_ITEM_SIZE_BYTES +
+                ", key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
             throw new Error(errMsg);
         }
         return jsonString;
@@ -130,9 +128,6 @@ var LocalStorageStore = /** @class */ (function () {
                     if (attempt >= retryAttempts) {
                         var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' in key-value store;" +
                             "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + ", but clearing old data from the store threw another error: " + err;
-                        if (console && typeof console.error === "function") {
-                            console.error(errMsg, err.message, err.stack);
-                        }
                         throw new Error(errMsg);
                     }
                 }

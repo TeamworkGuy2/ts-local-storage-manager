@@ -4,7 +4,14 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.14](N/A) - 2018-12-29
+### [0.6.15](N/A) - 2019-05-10
+#### Changed
+* Removed `package.json` `@types/node` dependency
+* Removed `console.error()` error logging calls since all occurances also `throw new Error()`, calling code can decide how to log
+
+
+--------
+### [0.6.14](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/ffdc3aff84bf1f5b5865e7c93706c3b6284b2812) - 2018-12-29
 #### Changed
 * Cleanup documentation
 * Cleanup `LocalStorageStore.newTimestampInst()`

@@ -130,9 +130,6 @@ class LocalStoreWrapper implements LocalStore {
 
         if (jsonString.length > this.MAX_ITEM_SIZE_BYTES) {
             var errMsg = "attempting to save too large a value to localStorage, key='" + key + "' size is " + jsonString.length + ", value='" + jsonString.substr(0, 100) + (jsonString.length > 100 ? "..." : "") + "'";
-            if (console && typeof console.error === "function") {
-                console.error(errMsg);
-            }
             throw new Error(errMsg);
         }
         return jsonString;
@@ -167,9 +164,6 @@ class LocalStoreWrapper implements LocalStore {
                         var errMsg = "problem: storing key-value '" + key + "' = '" + (value && value.substr ? value.substr(0, 100) : value) + "' in key-value store;" +
                             "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + " from: " + err + ", " +
                             "but attempting to recover threw another error: " + e2;
-                        if (console && typeof console.error === "function") {
-                            console.error(errMsg, err.message, err.stack);
-                        }
                         throw new Error(errMsg);
                     }
                 }

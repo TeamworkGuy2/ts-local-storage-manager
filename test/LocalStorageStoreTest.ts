@@ -1,5 +1,4 @@
-﻿/// <reference types="node" />
-"use strict";
+﻿"use strict";
 import chai = require("chai");
 import mocha = require("mocha");
 import MemoryStore = require("../local-store/MemoryStore");
@@ -137,12 +136,6 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         asr.deepEqual(keys2, ["A"]);
         asr.notDeepEqual(keys2, keys1);
     });
-
-
-    function simpleStringHashCode(str: string): number {
-        return (str.length > 0 ? str.charCodeAt(0) << 16 : 0) +
-            (str.length > 1 ? str.charCodeAt(1) : 0);
-    }
 
 
     function checkStoreFullErrorData(errRef: LocalStore.ItemsRemovedEvent, expectedItems: { [key: string]: any }) {

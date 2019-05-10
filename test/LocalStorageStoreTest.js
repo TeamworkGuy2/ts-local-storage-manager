@@ -1,4 +1,3 @@
-/// <reference types="node" />
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai = require("chai");
@@ -107,10 +106,6 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         asr.deepEqual(keys2, ["A"]);
         asr.notDeepEqual(keys2, keys1);
     });
-    function simpleStringHashCode(str) {
-        return (str.length > 0 ? str.charCodeAt(0) << 16 : 0) +
-            (str.length > 1 ? str.charCodeAt(1) : 0);
-    }
     function checkStoreFullErrorData(errRef, expectedItems) {
         asr.notEqual(errRef, null);
         var expectedKeys = Object.keys(expectedItems);
