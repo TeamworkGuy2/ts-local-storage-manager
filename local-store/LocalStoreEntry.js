@@ -1,4 +1,8 @@
 "use strict";
+/** Contains classes for managing local store key-values as common data structures
+ * @author TeamworkGuy2
+ * @since 2016-5-28
+ */
 var LocalStoreEntry;
 (function (LocalStoreEntry) {
     var Array = /** @class */ (function () {

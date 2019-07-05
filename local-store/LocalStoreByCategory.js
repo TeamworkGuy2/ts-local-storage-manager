@@ -2,7 +2,7 @@
 var LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
 var LocalStoreWrapper = require("./LocalStoreWrapper");
 var ClearFullStore = require("./ClearFullStore");
-/**
+/** A category store contains multiple UniqueStores each tracking a subset of keys from a main 'root' LocalStore based on KeyCategorizer.
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
@@ -12,7 +12,7 @@ var LocalStoreByCategory = /** @class */ (function () {
         this.rootStore = rootStore;
         this.timestampKeyGenerator = timestampKeyGenerator;
         this.stores = {};
-        this.fullStoreHandlers = {};
+        this.storeHandlers = {};
         var handleFullStore = function (store, err) {
             _this.handleFullStores(store, err);
         };
@@ -23,7 +23,7 @@ var LocalStoreByCategory = /** @class */ (function () {
             var store = storeMap[key];
             store.handleFullStoreCallback = handleFullStore;
             this.stores[key] = store.store;
-            this.fullStoreHandlers[key] = store;
+            this.storeHandlers[key] = store;
         }
     }
     LocalStoreByCategory.prototype.getStore = function (category) {
@@ -44,7 +44,7 @@ var LocalStoreByCategory = /** @class */ (function () {
         // loop through and clear each store when one is full since they all share the same base store
         for (var i = 0, size = this.storeNames.length; i < size; i++) {
             var name = this.storeNames[i];
-            var categoryStore = this.fullStoreHandlers[name];
+            var categoryStore = this.storeHandlers[name];
             var res = categoryStore.clearFullStore.clearOldItems(categoryStore.baseStore, false, err);
         }
     };
@@ -104,7 +104,7 @@ var LocalStoreByCategory = /** @class */ (function () {
                 return ary;
             }
             var size = ary.length;
-            if (ary.length < 1 || index < 0 || index >= ary.length) {
+            if (size < 1 || index < 0 || index >= size) {
                 return ary;
             }
             for (var i = index + 1; i < size; i++) {

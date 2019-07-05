@@ -40,7 +40,7 @@ class ClearFullStore {
         if (this.itemsRemovedCallback && removedItems.removedCount > 0) {
             this.itemsRemovedCallback(store, removedItems.items, {
                 error: err,
-                message: "removed " + removedItems.items.length + " local store entries" + (start || end ? " in " + Math.round(end - start) + " ms" : "") + ", " +
+                message: "removed " + removedItems.items.length + " local store entries" + (logInfo ? " in " + Math.round(end - start) + " ms" : "") + ", " +
                     "because local store threw error" + (err ? ": '" + err.message + "': " + JSON.stringify(err.stack) : ""),
             }, removedItems.removedCount);
         }

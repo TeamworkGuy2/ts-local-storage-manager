@@ -3,8 +3,9 @@ import UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
 
 declare var window: any;
 
-/** LocalStoreByTimestamp namespace
- * persistent storage interface for small objects or data blobs
+/** LocalStoreByTimestamp is a UniqueStore implementation whick takes a 'keyGenerator'.
+ * The key generator creates keys for the addItem() method instead of the caller providing a key as with LocalStore.setItem()
+ * @see UniqueStore
  * @see LocalStore
  * @author TeamworkGuy2
  * @since 2016-3-25

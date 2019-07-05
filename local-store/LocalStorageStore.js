@@ -1,7 +1,7 @@
 "use strict";
 var ClearFullStore = require("./ClearFullStore");
 var MemoryStore = require("./MemoryStore");
-/** LocalStore implementation wrapper for StorageLike objects
+/** LocalStore implementation wrapper for StorageLike objects (i.e. window.localStorage and window.sessionStorage)
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
@@ -120,16 +120,20 @@ var LocalStorageStore = /** @class */ (function () {
                 return;
             }
             catch (err) {
+                var err2 = undefined;
                 try {
-                    // clean out old data in-case the error was the local store running out of space, if the full store handle is null, just let that generate a null error
+                    // clean out old data in-case the error was the local store running out of space, if the full store handler fails, just let that generate a null error
                     this.handleFullStore(this, err);
                 }
                 catch (e2) {
-                    if (attempt >= retryAttempts) {
-                        var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' in key-value store;" +
-                            "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + ", but clearing old data from the store threw another error: " + err;
-                        throw new Error(errMsg);
-                    }
+                    err2 = e2;
+                }
+                if (attempt >= retryAttempts) {
+                    var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' (len: " + value.length + ") in key-value store;" +
+                        "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") +
+                        (err2 != null ? ", but clearing old data from the store threw another error; " : "; ") +
+                        "error: storing: " + err + (err2 != null ? ",\nclearing: " + err2 : "");
+                    throw new Error(errMsg);
                 }
             }
         }

@@ -156,16 +156,20 @@ class LocalStoreWrapper implements LocalStore {
 
                 return;
             } catch (err) {
+                var err2: Error = <never>undefined;
                 try {
                     // clean out old data in-case the error was the local store running out of space
                     this.handleFullStore(this, err);
                 } catch (e2) {
-                    if (attempt >= retryAttempts) {
-                        var errMsg = "problem: storing key-value '" + key + "' = '" + (value && value.substr ? value.substr(0, 100) : value) + "' in key-value store;" +
-                            "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + " from: " + err + ", " +
-                            "but attempting to recover threw another error: " + e2;
-                        throw new Error(errMsg);
-                    }
+                    err2 = e2;
+                }
+
+                if (attempt >= retryAttempts) {
+                    var errMsg = "problem: storing key-value '" + key + "' = '" + (value && value.substr ? value.substr(0, 100) : value) + "' (len: " + (value ? value.length : NaN) + ") in key-value store;" +
+                        "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") +
+                        (err2 != null ? ", but attempting to recover threw another error; " : "; ") +
+                        "error: storing: " + err + (err2 != null ? ",\nclearing: " + err2 : "");
+                    throw new Error(errMsg);
                 }
             }
         }

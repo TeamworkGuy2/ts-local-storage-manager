@@ -4,7 +4,15 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.15](N/A) - 2019-05-10
+### [0.6.16](N/A) - 2019-07-04
+#### Changed
+* Update to TypeScript 3.5
+* Marked `ReadOnlyLocalStore.length`, `LocalStore.Array.key`, and `LocalStore.Var.key` readonly
+* Fixed `LocalStorageStore` and `LocalStorageWrapper` `setItem()` to always throw storage error after retry attempts fail
+
+
+--------
+### [0.6.15](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/048f1c7309becd1a0305c3d9e5efcf1a0bb903b6) - 2019-05-10
 #### Changed
 * Removed `package.json` `@types/node` dependency
 * Removed `console.error()` error logging calls since all occurances also `throw new Error()`, calling code can decide how to log

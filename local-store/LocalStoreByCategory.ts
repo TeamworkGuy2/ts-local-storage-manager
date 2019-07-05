@@ -3,7 +3,7 @@ import LocalStoreWrapper = require("./LocalStoreWrapper");
 import MemoryStore = require("./MemoryStore");
 import ClearFullStore = require("./ClearFullStore");
 
-/**
+/** A category store contains multiple UniqueStores each tracking a subset of keys from a main 'root' LocalStore based on KeyCategorizer.
  * @author TeamworkGuy2
  * @since 2016-3-26
  */
@@ -12,14 +12,14 @@ class LocalStoreByCategory<M extends object> {
     public rootStore: LocalStore;
     public stores: M;
     private storeNames: string[];
-    private fullStoreHandlers: { [key: string]: LocalStoreByCategory.CategoryStore };
+    private storeHandlers: { [key: string]: LocalStoreByCategory.CategoryStore };
 
 
     constructor(rootStore: LocalStore, timestampKeyGenerator: () => (string | number), storeMap: M) {
         this.rootStore = rootStore;
         this.timestampKeyGenerator = timestampKeyGenerator;
         this.stores = <M>{};
-        this.fullStoreHandlers = {};
+        this.storeHandlers = {};
 
         var handleFullStore: LocalStore.FullStoreHandler = (store, err) => {
             this.handleFullStores(store, err);
@@ -33,12 +33,12 @@ class LocalStoreByCategory<M extends object> {
             var store: LocalStoreByCategory.CategoryStore = (<any>storeMap)[key];
             store.handleFullStoreCallback = handleFullStore;
             (<any>this.stores)[key] = store.store;
-            this.fullStoreHandlers[key] = store;
+            this.storeHandlers[key] = store;
         }
     }
 
 
-    public getStore(category: string) {
+    public getStore(category: string): UniqueStore {
         return (<any>this.stores)[category];
     }
 
@@ -60,7 +60,7 @@ class LocalStoreByCategory<M extends object> {
         // loop through and clear each store when one is full since they all share the same base store
         for (var i = 0, size = this.storeNames.length; i < size; i++) {
             var name = this.storeNames[i];
-            var categoryStore = this.fullStoreHandlers[name];
+            var categoryStore = this.storeHandlers[name];
             var res = categoryStore.clearFullStore.clearOldItems(categoryStore.baseStore, false, err);
         }
     }
@@ -161,7 +161,7 @@ module LocalStoreByCategory {
         public static removeIdx<E>(ary: E[], index: number): E[] {
             if (ary == null) { return ary; }
             var size = ary.length;
-            if (ary.length < 1 || index < 0 || index >= ary.length) { return ary; }
+            if (size < 1 || index < 0 || index >= size) { return ary; }
 
             for (var i = index + 1; i < size; i++) {
                 ary[i - 1] = ary[i];

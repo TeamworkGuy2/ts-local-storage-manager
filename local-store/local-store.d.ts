@@ -2,7 +2,7 @@
  */
 declare interface ReadOnlyLocalStore {
     /** the number of key-value pairs in this store */
-    length: number;
+    readonly length: number;
 
     /** Get the value associated with a key
      * @param key the name of the value to retrieve
@@ -146,7 +146,7 @@ declare module LocalStore {
 
 
     export interface Array<T> {
-        key: string; // readonly
+        readonly key: string;
 
         get(): T[];
 
@@ -159,7 +159,7 @@ declare module LocalStore {
 
 
     export interface Var<T> {
-        key: string; // readonly
+        readonly key: string;
 
         get(): T;
 

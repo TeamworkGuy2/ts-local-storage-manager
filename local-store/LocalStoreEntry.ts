@@ -1,8 +1,12 @@
-﻿module LocalStoreEntry {
+﻿/** Contains classes for managing local store key-values as common data structures
+ * @author TeamworkGuy2
+ * @since 2016-5-28
+ */
+module LocalStoreEntry {
 
     export class Array<T> implements LocalStore.Array<T> {
         private store: LocalStore;
-        public key: string; // readonly
+        public readonly key: string;
         private defaultValue: T[];
 
         constructor(store: LocalStore, key: string, defaultValue?: T[]) {
@@ -32,7 +36,7 @@
 
     export class Var<T> implements LocalStore.Var<T> {
         private store: LocalStore;
-        public key: string; // readonly
+        public readonly key: string;
         private defaultValue: T;
         private plainStr: boolean;
 

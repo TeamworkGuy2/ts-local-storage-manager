@@ -9,7 +9,6 @@ import CommonStorageTests = require("./CommonStorageTests");
 
 var asr = chai.assert;
 
-
 suite("LocalStorageStore", function LocalStoreStorageTest() {
 
     test("local-store-from-storage-1", function LocalStorageStoreScenario1Test() {
@@ -56,7 +55,7 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         var removePercentage = 0.49;
         var memStore = MemoryStore.newInst(undefined, 3);
         var fullStoreHandler = ClearFullStore.newInst((key) => parseInt(key.substr(key.lastIndexOf('-') + 1)), (store, items, err, removedCount) => itemsRemovedFunc(store, items, err, removedCount), removePercentage);
-        var baseStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
+        var baseStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 50, false);
         // ---- test exceeding max items and removing 1 item ----
         // assuming removal-percentage-when-full is less than 50%
         baseStore.setItem("one-123", { value: "one" });
@@ -103,6 +102,42 @@ suite("LocalStorageStore", function LocalStoreStorageTest() {
         });
 
         asr.deepEqual(store.getKeys().sort(), ["one-123", "seven-7", "three-300"]);
+    });
+
+
+    test("local-store-full-handling-failure", function LocalStorageStoreClearFull() {
+        var itemsRemovedFunc: LocalStore.ItemsRemovedCallback;
+        var removePercentage = 0.1;
+        var memStore = MemoryStore.newInst(undefined, 3);
+        var fullStoreHandler = ClearFullStore.newInst((key) => parseInt(key.substr(key.lastIndexOf('-') + 1)), (store, items, err, removedCount) => itemsRemovedFunc(store, items, err, removedCount), removePercentage);
+        var baseStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 50, false);
+        // ---- test storage full handling error ----
+        baseStore.setItem("one-1", { value: "one" });
+        baseStore.setItem("two-2", { value: "two" });
+        baseStore.setItem("three-3", { value: "three" });
+
+        var store = LocalStoreWrapper.newInst(baseStore, (store, err) => fullStoreHandler.clearOldItems(store, true, err, removePercentage, throwRemovalError ? 0 : 1), true, true, undefined, true);
+        // setup a local store full callback which increments the 'errorCnt' variable
+        var throwRemovalError = false;
+        var errorCnt = 0;
+        itemsRemovedFunc = (store, removedItems, storageError, removedCount) => {
+            errorCnt++;
+            if (throwRemovalError) {
+                throw new Error("removal test");
+            }
+        };
+
+        // add items causing the full storage handle to get called
+        store.setItem("four-4", { value: "four" });
+        asr.equal(errorCnt, 1);
+        store.setItem("five-5", { value: "five" });
+        asr.equal(errorCnt, 2);
+        store.setItem("six-6", { value: "six" });
+        asr.equal(errorCnt, 3);
+
+        throwRemovalError = true;
+        asr.throws(() => store.setItem("seven-7", { value: "seven-seven-seven-seven" }));
+        asr.equal(errorCnt, 3);
     });
 
 

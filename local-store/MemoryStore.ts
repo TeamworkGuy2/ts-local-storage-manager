@@ -1,4 +1,5 @@
-﻿/** An in-memory 'localStorage' like class
+﻿/** An in-memory StorageLike like class.
+ * Can be used in node.js as a stand-in for 'window.localStorage', although it does NOT perfectly mimic 'localStorage' behavior.
  * @author TeamworkGuy2
  * @since 2016-3-26
  */

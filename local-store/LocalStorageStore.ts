@@ -3,7 +3,7 @@ import MemoryStore = require("./MemoryStore");
 
 declare var window: any;
 
-/** LocalStore implementation wrapper for StorageLike objects
+/** LocalStore implementation wrapper for StorageLike objects (i.e. window.localStorage and window.sessionStorage)
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
@@ -149,15 +149,20 @@ class LocalStorageStore implements LocalStore {
 
                 return;
             } catch (err) {
+                var err2: Error = <never>undefined;
                 try {
-                    // clean out old data in-case the error was the local store running out of space, if the full store handle is null, just let that generate a null error
+                    // clean out old data in-case the error was the local store running out of space, if the full store handler fails, just let that generate a null error
                     this.handleFullStore(this, err);
                 } catch (e2) {
-                    if (attempt >= retryAttempts) {
-                        var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' in key-value store;" +
-                            "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") + ", but clearing old data from the store threw another error: " + err;
-                        throw new Error(errMsg);
-                    }
+                    err2 = e2;
+                }
+
+                if (attempt >= retryAttempts) {
+                    var errMsg = "problem: storing key-value '" + key + "' = '" + value.substr(0, 100) + "' (len: " + value.length + ") in key-value store;" +
+                        "context: storing the item threw an error, attempted to recover" + (retryAttempts > 1 ? " " + retryAttempts + " times" : "") +
+                        (err2 != null ? ", but clearing old data from the store threw another error; " : "; ") +
+                        "error: storing: " + err + (err2 != null ? ",\nclearing: " + err2 : "");
+                    throw new Error(errMsg);
                 }
             }
         }
@@ -229,6 +234,7 @@ class LocalStorageStore implements LocalStore {
      */
     public static newTimestampInst(store: StorageLike & { getKeys?: () => string[]; }, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
         var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
+
         return new LocalStorageStore(store, null, (store, err) => {
             clearer.clearOldItems(store, logInfo, err);
         }, true, true, undefined, true);
