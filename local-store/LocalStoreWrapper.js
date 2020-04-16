@@ -46,15 +46,15 @@ var LocalStoreWrapper = /** @class */ (function () {
         this.totalDataSize = 0;
         this.modCount = 0;
     };
-    LocalStoreWrapper.prototype.key = function (index) {
-        return this.store.key(index);
-    };
     LocalStoreWrapper.prototype.getItem = function (key, plainString) {
         if (!key) {
             throw new Error("cannot access item from store without an identifier key");
         }
         var value = this.store.getItem(key, true);
         return plainString === true ? value : (value != null ? JSON.parse(value) : null);
+    };
+    LocalStoreWrapper.prototype.key = function (index) {
+        return this.store.key(index);
     };
     LocalStoreWrapper.prototype.hasItem = function (key) {
         return this.getItem(key, true) != null;

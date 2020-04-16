@@ -4,7 +4,6 @@ import mocha = require("mocha");
 import MemoryStore = require("../local-store/MemoryStore");
 import CommonStorageTests = require("./CommonStorageTests");
 
-
 var asr = chai.assert;
 
 

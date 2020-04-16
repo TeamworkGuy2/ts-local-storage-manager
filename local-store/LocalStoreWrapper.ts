@@ -1,5 +1,4 @@
-﻿import LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
-import MemoryStore = require("./MemoryStore");
+﻿import MemoryStore = require("./MemoryStore");
 
 /** A 'LocalStore' wrapper over an existing LocalStore for encapsulation, additional storage/retrival logic, etc.
  * @author TeamworkGuy2
@@ -56,16 +55,18 @@ class LocalStoreWrapper implements LocalStore {
     }
 
 
-    public key(index: number): string {
-        return this.store.key(index);
-    }
-
-
     public getItem(key: string, plainString?: boolean): any {
-        if (!key) { throw new Error("cannot access item from store without an identifier key"); }
+        if (!key) {
+            throw new Error("cannot access item from store without an identifier key");
+        }
 
         var value = this.store.getItem(key, true);
         return plainString === true ? value : (value != null ? JSON.parse(value) : null);
+    }
+
+
+    public key(index: number): string {
+        return this.store.key(index);
     }
 
 

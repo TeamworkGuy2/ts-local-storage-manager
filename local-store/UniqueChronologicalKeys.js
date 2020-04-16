@@ -5,18 +5,29 @@
  */
 var UniqueChronologicalKey;
 (function (UniqueChronologicalKey) {
-    function uniqueTimestamp() {
+    /** returns a double where the whole number is a linux epoch millisecond timestamp using 'Date.now()'
+     * and the decimal portion is a semi-unique identifier to avoid collisions when calling this method multiple times within a few milliseconds
+     */
+    function uniqueTimestampBrowser() {
         // work around for the granularity of Date.now() and the rollover issue with performance.now()
-        return Math.round((Date.now() + window.performance.now() /*millisecond with decimal portion up to microsecond precise*/) / 2 * 1000);
+        return Date.now() + Math.random(); // window.performance.now()/*millisecond with decimal portion up to microsecond precise*/
     }
-    UniqueChronologicalKey.uniqueTimestamp = uniqueTimestamp;
+    UniqueChronologicalKey.uniqueTimestampBrowser = uniqueTimestampBrowser;
+    /** returns a double where the whole number is a linux epoch millisecond timestamp using 'Date.now()'
+     * and the decimal portion is a semi-unique identifier to avoid collisions when calling this method multiple times within a few milliseconds
+     */
     function uniqueTimestampNodeJs() {
         // work around for the granularity of Date.now() and the rollover issue with performance.now()
-        return Math.round((Date.now() + global.process.hrtime()[1] /*nanoseconds*/) / 2 * 1000);
+        return Date.now() + Math.random(); // (global.process.hrtime()[1]/*nanoseconds*/ / 1000)
     }
     UniqueChronologicalKey.uniqueTimestampNodeJs = uniqueTimestampNodeJs;
-    /** get a chronological millisecond value, pairs of calls to this function during the same runtime can be compared to get relatively acurate time measurements,
-     * no other guarantees are made about the returned number
+    /** get a double where the whole number is a linux epoch millisecond timestamp and the decimal portion is a
+     * semi-unique identifier to avoid collisions when calling this method multiple times within a few milliseconds
+     */
+    UniqueChronologicalKey.uniqueTimestamp = (typeof window !== "undefined") ? uniqueTimestampBrowser : uniqueTimestampNodeJs;
+    /** Get a chronological millisecond value, pairs of calls to this function during the same runtime can be compared to get relatively acurate time measurements,
+     * no other guarantees are made about the returned number.
+     * Note: these methods may not return sub-millisecond accuracy due to fingerprinting and Spectre security concerns: https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp#Reduced_time_precision
      */
     UniqueChronologicalKey.getMillisecondTime = ((typeof window !== "undefined" && window && window.performance) ? function () {
         return window.performance.now();

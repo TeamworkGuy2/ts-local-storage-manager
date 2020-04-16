@@ -1,8 +1,6 @@
 ﻿import ClearFullStore = require("./ClearFullStore");
 import UniqueChronologicalKeys = require("./UniqueChronologicalKeys");
 
-declare var window: any;
-
 /** LocalStoreByTimestamp is a UniqueStore implementation whick takes a 'keyGenerator'.
  * The key generator creates keys for the addItem() method instead of the caller providing a key as with LocalStore.setItem()
  * @see UniqueStore
@@ -77,19 +75,15 @@ class LocalStoreByTimestamp implements UniqueStore {
     }
 
 
-    public static newInst(storeInst: LocalStore, keyGenerator: () => string, handleFullStore: LocalStore.FullStoreHandler) {
-        return new LocalStoreByTimestamp(storeInst, keyGenerator, handleFullStore);
-    }
-
-
     /** Creates a local store instance that uses 'UniqueTimestamp' for unique keys and 'ClearFullStore' for cleaning out full stores
      * @param localStore the key-value store to use
      * @param logInfo optional flag to log store clearing events to the key-value store
      * @param removeRatio optional percentage of items to remove from the store when it's full
+     * @param keyGenerator optional function which generates a key for storing items when addItem() is called, default is 'UniqueChronologicalKeys.uniqueTimestamp'
      */
-    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
+    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number, keyGenerator?: () => (string | number)) {
         var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
-        return new LocalStoreByTimestamp(localStore, typeof window !== "undefined" ? UniqueChronologicalKeys.uniqueTimestamp : UniqueChronologicalKeys.uniqueTimestampNodeJs, (storeInst, err) => {
+        return new LocalStoreByTimestamp(localStore, keyGenerator || UniqueChronologicalKeys.uniqueTimestamp, (storeInst, err) => {
             clearer.clearOldItems(storeInst, logInfo, err);
         });
     }

@@ -11,7 +11,7 @@ var asr = chai.assert;
 suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
     var memStore = MemoryStore.newInst();
     var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
-    var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+    var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
     var store = storeBldr.addStores({
         alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),
         omega: storeBldr.toStore(BasicCategorizers.newSuffixCategorizer("-omega")),
@@ -82,7 +82,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
         var dI = 0;
         var memStore = MemoryStore.newInst(10);
         var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
-        var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+        var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
         var store = storeBldr.addStores({
             charlie: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("c-"), function (storeInst, removedItems, err, removedCount) { return cI++; }),
             delta: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("d-"), function (storeInst, removedItems, err, removedCount) { return dI++; }),

@@ -1,14 +1,12 @@
 ﻿"use strict";
 import chai = require("chai");
 import mocha = require("mocha");
-import ClearFullStore = require("../local-store/ClearFullStore");
 import LocalStoreByCategory = require("../local-store/LocalStoreByCategory");
 import UniqueChronologicalKeys = require("../local-store/UniqueChronologicalKeys");
 import MemoryStore = require("../local-store/MemoryStore");
 import LocalStorageStore = require("../local-store/LocalStorageStore");
 import BasicCategorizers = require("../local-store/BasicCategorizers");
 import CommonStorageTests = require("./CommonStorageTests");
-
 
 var asr = chai.assert;
 
@@ -25,7 +23,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
 
     var memStore = MemoryStore.newInst();
     var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
-    var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+    var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
     var store = storeBldr.addStores({
         alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),
         omega: storeBldr.toStore(BasicCategorizers.newSuffixCategorizer("-omega")),
@@ -106,7 +104,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
         var dI = 0;
         var memStore = MemoryStore.newInst(10);
         var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, true, false, 80, false);
-        var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestampNodeJs);
+        var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
         var store = storeBldr.addStores({
             charlie: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("c-"), (storeInst, removedItems, err, removedCount) => cI++),
             delta: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("d-"), (storeInst, removedItems, err, removedCount) => dI++),

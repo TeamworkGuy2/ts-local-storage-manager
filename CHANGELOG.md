@@ -4,7 +4,20 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.6.17](N/A) - 2019-11-08
+### [0.7.0](N/A) - 2020-04-16
+#### Changed
+* Added optional `keyGenerator` parameter to `LocalStoreByTimestamp.newTimestampInst()`
+* Cleaned up `UniqueChronologicalKeys` code to better work with timestamp rounding in modern browsers due to fingerprinting concerns and attacks like Spectre
+  * `uniqueTimestamp()` renamed `uniqueTimestampBrowser()`
+  * new `uniqueTimestamp()` created that provides the best implementation for the currently detected environment
+* Added a unit test to assess the uniqueness of UniqueChronologicalKeys functions.
+
+#### Removed
+* Removed `LocalStoreByTimestamp.newInst()`
+
+
+--------
+### [0.6.17](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/aeed679072e64e583a92bbc73e9d6165567c653a) - 2019-11-08
 #### Changed
 * Update to TypeScript 3.7
 
