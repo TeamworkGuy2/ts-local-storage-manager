@@ -7,10 +7,10 @@ var ClearFullStore = require("./ClearFullStore");
  * @since 2016-3-26
  */
 var LocalStoreByCategory = /** @class */ (function () {
-    function LocalStoreByCategory(rootStore, timestampKeyGenerator, storeMap) {
+    function LocalStoreByCategory(rootStore, keyGenerator, storeMap) {
         var _this = this;
         this.rootStore = rootStore;
-        this.timestampKeyGenerator = timestampKeyGenerator;
+        this.keyGenerator = keyGenerator;
         this.stores = {};
         this.storeHandlers = {};
         var handleFullStore = function (store, err) {

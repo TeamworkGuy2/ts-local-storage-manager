@@ -10,7 +10,7 @@ var CommonStorageTests = require("./CommonStorageTests");
 var asr = chai.assert;
 suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
     var memStore = MemoryStore.newInst();
-    var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+    var localStore = new LocalStorageStore(memStore, null, null, true, false, 80, false, undefined);
     var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
     var store = storeBldr.addStores({
         alpha: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("alpha-")),
@@ -81,7 +81,7 @@ suite("LocalStoreByCategory", function LocalStoreByCategoryTest() {
         var cI = 0;
         var dI = 0;
         var memStore = MemoryStore.newInst(10);
-        var localStore = LocalStorageStore.newInst(memStore, null, null, true, false, 80, false);
+        var localStore = new LocalStorageStore(memStore, null, null, true, false, 80, false, undefined);
         var storeBldr = LocalStoreByCategory.Builder.newInst(localStore, UniqueChronologicalKeys.uniqueTimestamp);
         var store = storeBldr.addStores({
             charlie: storeBldr.toStore(BasicCategorizers.newPrefixCategorizer("c-"), function (storeInst, removedItems, err, removedCount) { return cI++; }),

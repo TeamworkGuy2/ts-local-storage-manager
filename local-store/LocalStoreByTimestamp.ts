@@ -80,9 +80,11 @@ class LocalStoreByTimestamp implements UniqueStore {
      * @param logInfo optional flag to log store clearing events to the key-value store
      * @param removeRatio optional percentage of items to remove from the store when it's full
      * @param keyGenerator optional function which generates a key for storing items when addItem() is called, default is 'UniqueChronologicalKeys.uniqueTimestamp'
+     * @param keyParser optional function which parses a 'store' key and extracts a numeric sort order value (default: parseInt)
      */
-    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number, keyGenerator?: () => (string | number)) {
-        var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
+    public static newTimestampInst(localStore: LocalStore, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number, keyGenerator?: () => (string | number), keyParser: (key: string) => number = parseInt) {
+        var clearer = ClearFullStore.newInst(keyParser, itemsRemovedCallback, removePercentage);
+
         return new LocalStoreByTimestamp(localStore, keyGenerator || UniqueChronologicalKeys.uniqueTimestamp, (storeInst, err) => {
             clearer.clearOldItems(storeInst, logInfo, err);
         });

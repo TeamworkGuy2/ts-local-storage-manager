@@ -1,14 +1,12 @@
 ﻿import ClearFullStore = require("./ClearFullStore");
 import MemoryStore = require("./MemoryStore");
 
-declare var window: any;
-
 /** LocalStore implementation wrapper for StorageLike objects (i.e. window.localStorage and window.sessionStorage)
  * @author TeamworkGuy2
  * @since 2016-3-24
  */
 class LocalStorageStore implements LocalStore {
-    private MAX_ITEM_SIZE_BYTES = 1000000;
+    public MAX_ITEM_SIZE_BYTES = 1000000;
     private store: StorageLike & { getKeys?: () => string[]; };
     private getStoreKeys: ((store: StorageLike) => string[]) | null | undefined;
     private handleFullStore: LocalStore.FullStoreHandler;
@@ -22,7 +20,7 @@ class LocalStorageStore implements LocalStore {
     /**
      * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore.
      * Note: the optional getKeys() function MUST return a new array each time it is called
-     * @param getStoreKeys a function that gets the keys from the 'store' (Note: this function function MUST return a new array each time it is called)
+     * @param getStoreKeys a function that gets the keys from the 'store' (Note: this function MUST return a new array each time it is called)
      * @param handleFullStore the handler to call when 'store' fails to store an item
      * @param trackKeysAndLen true to track the number of items and item keys added to this store
      * @param trackTotalSize true to track the total data size of the items in this store
@@ -31,7 +29,7 @@ class LocalStorageStore implements LocalStore {
      * @param keyFilter optional storage key filter used if 'loadExistingData'
      */
     constructor(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: ((store: StorageLike) => string[]) | null | undefined, handleFullStore: LocalStore.FullStoreHandler,
-            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData: boolean, keyFilter?: (key: string) => boolean) {
+            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
         this.store = store;
         this.getStoreKeys = getStoreKeys;
         this.handleFullStore = handleFullStore;
@@ -209,31 +207,16 @@ class LocalStorageStore implements LocalStore {
     }
 
 
-    /**
-     * @param store the underlying data store, this could be a string based store (i.e. native browser 'localStorage' or a MemoryStore instance) or it could be another LocalStore.
-     * Note: the optional getKeys() function MUST return a new array each time it is called
-     * @param getStoreKeys a function that gets the keys from the 'store' (Note: this function MUST return a new array each time it is called)
-     * @param trackKeysAndLen true to track the number of items and item keys added to this store
-     * @param trackTotalSize true to track the total data size of the items in this store
-     * @param maxValueSizeBytes an optional maximum size of values stored in this store
-     * @param loadExistingData optional flag to enable filtering the keys from the 'store' and load those which match the 'keyFilter'
-     * @param keyFilter optional storage key filter used if 'loadExistingData'
-     */
-    public static newInst(store: StorageLike & { getKeys?: () => string[]; }, getStoreKeys: ((store: StorageLike) => string[]) | null | undefined, handleFullStore: LocalStore.FullStoreHandler,
-            trackKeysAndLen: boolean, trackTotalSize: boolean, maxValueSizeBytes: number = 1000000, loadExistingData?: boolean, keyFilter?: (key: string) => boolean) {
-        return new LocalStorageStore(store, getStoreKeys, handleFullStore, trackKeysAndLen, trackTotalSize, maxValueSizeBytes, <boolean>loadExistingData, keyFilter);
-    }
-
-
-    /** Create a LocalStore object from a StorageLike object and an optional item removal callback
+    /** Create a LocalStore object from a StorageLike object with additional options and handlers/callbacks
      * @param store the store that will be used to store data.
      * Note: the optional getKeys() function MUST return a new array each time it is called
      * @param itemsRemovedCallback optional callback to call when items are removed from the store to free up space
      * @param logInfo optional flag to log store clearing events to the key-value store
      * @param removeRatio optional percentage of items to remove from the store when it's full
+     * @param keyParser optional function which parses a 'store' key and extracts a numeric sort order value (default: parseInt)
      */
-    public static newTimestampInst(store: StorageLike & { getKeys?: () => string[]; }, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number) {
-        var clearer = ClearFullStore.newInst(Number.parseInt, itemsRemovedCallback, removePercentage);
+    public static newTimestampInst(store: StorageLike & { getKeys?: () => string[]; }, itemsRemovedCallback?: LocalStore.ItemsRemovedCallback, logInfo?: boolean, removePercentage?: number, keyParser: (key: string) => number = parseInt) {
+        var clearer = ClearFullStore.newInst(keyParser, itemsRemovedCallback, removePercentage);
 
         return new LocalStorageStore(store, null, (store, err) => {
             clearer.clearOldItems(store, logInfo, err);

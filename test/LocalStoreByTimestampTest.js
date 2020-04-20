@@ -9,7 +9,7 @@ var asr = chai.assert;
 suite("LocalStoreByTimestamp", function LocalStoreByTimestampTest() {
     test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test() {
         var memStore = MemoryStore.newInst();
-        var localStore = LocalStorageStore.newInst(memStore, null, null, false, false, 20);
+        var localStore = new LocalStorageStore(memStore, null, null, false, false, 20, false, undefined);
         var store = LocalStoreByTimestamp.newTimestampInst(localStore);
         store.keyGenerator = UniqueChronologicalKeys.uniqueTimestamp;
         var keyA = store.addItem({ a: 1 });

@@ -6,7 +6,6 @@ import UniqueChronologicalKeys = require("../local-store/UniqueChronologicalKeys
 import MemoryStore = require("../local-store/MemoryStore");
 import LocalStorageStore = require("../local-store/LocalStorageStore");
 
-declare var global: { process: { hrtime(): [number, number]; } };
 declare var console: { log(...args: any[]): void };
 
 var asr = chai.assert;
@@ -16,7 +15,7 @@ suite("LocalStoreByTimestamp", function LocalStoreByTimestampTest() {
 
     test("local-store-by-timestamp-1", function LocalStoreByTimestampScenario1Test() {
         var memStore = MemoryStore.newInst();
-        var localStore = LocalStorageStore.newInst(memStore, null, <LocalStore.FullStoreHandler><any>null, false, false, 20);
+        var localStore = new LocalStorageStore(memStore, null, <LocalStore.FullStoreHandler><any>null, false, false, 20, false, undefined);
         var store = LocalStoreByTimestamp.newTimestampInst(localStore);
         store.keyGenerator = UniqueChronologicalKeys.uniqueTimestamp;
 

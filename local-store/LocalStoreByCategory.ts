@@ -1,6 +1,5 @@
 ﻿import LocalStoreByTimestamp = require("./LocalStoreByTimestamp");
 import LocalStoreWrapper = require("./LocalStoreWrapper");
-import MemoryStore = require("./MemoryStore");
 import ClearFullStore = require("./ClearFullStore");
 
 /** A category store contains multiple UniqueStores each tracking a subset of keys from a main 'root' LocalStore based on KeyCategorizer.
@@ -8,16 +7,16 @@ import ClearFullStore = require("./ClearFullStore");
  * @since 2016-3-26
  */
 class LocalStoreByCategory<M extends object> {
-    private timestampKeyGenerator: () => (string | number);
+    private keyGenerator: () => (string | number);
     public rootStore: LocalStore;
     public stores: M;
     private storeNames: string[];
     private storeHandlers: { [key: string]: LocalStoreByCategory.CategoryStore };
 
 
-    constructor(rootStore: LocalStore, timestampKeyGenerator: () => (string | number), storeMap: M) {
+    constructor(rootStore: LocalStore, keyGenerator: () => (string | number), storeMap: M) {
         this.rootStore = rootStore;
-        this.timestampKeyGenerator = timestampKeyGenerator;
+        this.keyGenerator = keyGenerator;
         this.stores = <M>{};
         this.storeHandlers = {};
 

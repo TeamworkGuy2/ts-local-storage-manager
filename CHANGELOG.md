@@ -4,7 +4,19 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.7.0](N/A) - 2020-04-16
+### [0.8.0](N/A) - 2020-04-20
+#### Changed
+* `LocalStorageStore.newTimestampInst()` added optional `keyParser` parameter
+* `LocalStoreByTimestamp.newTimestampInst()` added optional `keyParser` parameter
+* `LocalStorageStore.MAX_ITEM_SIZE_BYTES` is now public
+* Improve README
+
+#### Removed
+* `LocalStorageStore.newInst()`, use constructor instead
+
+
+--------
+### [0.7.0](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/33dd0e01cae0763f10053c365d7d716844e607d5) - 2020-04-16
 #### Changed
 * Added optional `keyGenerator` parameter to `LocalStoreByTimestamp.newTimestampInst()`
 * Cleaned up `UniqueChronologicalKeys` code to better work with timestamp rounding in modern browsers due to fingerprinting concerns and attacks like Spectre
@@ -13,7 +25,7 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 * Added a unit test to assess the uniqueness of UniqueChronologicalKeys functions.
 
 #### Removed
-* Removed `LocalStoreByTimestamp.newInst()`
+* Removed `LocalStoreByTimestamp.newInst()`, use constructor instead
 
 
 --------
