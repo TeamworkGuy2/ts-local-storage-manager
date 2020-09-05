@@ -40,12 +40,12 @@ var MemoryStore = /** @class */ (function () {
     };
     Object.defineProperty(MemoryStore.prototype, "length", {
         get: function () { return this.len; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(MemoryStore.prototype, "totalSizeChars", {
         get: function () { return this.totalDataSize; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     MemoryStore.prototype.clear = function () {

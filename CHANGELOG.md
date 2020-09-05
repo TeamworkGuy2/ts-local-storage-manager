@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.8.0](N/A) - 2020-04-20
+### [0.9.0](N/A) - 2020-09-04
+#### Changed
+* Update to TypeScript 4.0
+
+
+--------
+### [0.8.0](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/9be29a84a670bde3c41e00eb1955c2683a10e5ba) - 2020-04-20
 #### Changed
 * `LocalStorageStore.newTimestampInst()` added optional `keyParser` parameter
 * `LocalStoreByTimestamp.newTimestampInst()` added optional `keyParser` parameter

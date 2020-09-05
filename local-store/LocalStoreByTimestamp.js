@@ -16,7 +16,7 @@ var LocalStoreByTimestamp = /** @class */ (function () {
     }
     Object.defineProperty(LocalStoreByTimestamp.prototype, "length", {
         get: function () { return this.storeInst.length; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     LocalStoreByTimestamp.prototype.clear = function () {

@@ -31,12 +31,12 @@ var LocalStoreWrapper = /** @class */ (function () {
     }
     Object.defineProperty(LocalStoreWrapper.prototype, "length", {
         get: function () { return this.len; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(LocalStoreWrapper.prototype, "totalSizeChars", {
         get: function () { return this.totalDataSize; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     LocalStoreWrapper.prototype.clear = function () {

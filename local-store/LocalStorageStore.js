@@ -35,12 +35,12 @@ var LocalStorageStore = /** @class */ (function () {
     }
     Object.defineProperty(LocalStorageStore.prototype, "length", {
         get: function () { return this.len; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(LocalStorageStore.prototype, "totalSizeChars", {
         get: function () { return this.totalDataSize; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     LocalStorageStore.prototype.clear = function () {
