@@ -152,7 +152,7 @@ class LocalStorageStore implements LocalStore {
                     // clean out old data in-case the error was the local store running out of space, if the full store handler fails, just let that generate a null error
                     this.handleFullStore(this, err);
                 } catch (e2) {
-                    err2 = e2;
+                    err2 = <any>e2;
                 }
 
                 if (attempt >= retryAttempts) {

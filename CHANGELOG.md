@@ -4,7 +4,13 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-### [0.10.0](N/A) - 2021-06-12
+### [0.11.0](N/A) - 2022-01-02
+#### Changed
+* Update to TypeScript 4.4
+
+
+--------
+### [0.10.0](https://github.com/TeamworkGuy2/ts-local-storage-manager/commit/d0380f782f18750d2324d03c30fc4dd11c6b8a7f) - 2021-06-12
 #### Changed
 * Update to TypeScript 4.3
 
